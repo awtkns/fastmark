@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  queue:
+    image: rabbitmq
+    container_name: fastmark_queue
+    ports:
+      - 5672:5672
+
+  worker:
+    build: ./backend
+    command: dramatiq api
+    depends_on:
+      - queue
+
+  api:
+    build: ./backend
+    depends_on:
+      - worker
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./backend/api:/app/api
+

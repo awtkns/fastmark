@@ -8,4 +8,5 @@ dependencies:
   - python=3.8.5
   - sqlalchemy
   - uvicorn=0.11.3
+  - dramatiq
 

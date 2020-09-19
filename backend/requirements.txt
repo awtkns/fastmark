@@ -1,0 +1,7 @@
+amqp
+dramatiq 
+fastapi
+inflection
+pika
+sqlalchemy
+uvicorn

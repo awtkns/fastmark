@@ -2,10 +2,8 @@ from typing import List
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
-
-# from api import app
-
 router = APIRouter()
+
 
 html = """
 <!DOCTYPE html>
