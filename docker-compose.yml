@@ -10,6 +10,8 @@ services:
   worker:
     build: ./backend
     command: dramatiq api --watch api
+    env_file:
+      - docker.env
     depends_on:
       - queue
     volumes:
@@ -17,6 +19,8 @@ services:
 
   api:
     build: ./backend
+    env_file:
+      - docker.env
     depends_on:
       - worker
     ports:

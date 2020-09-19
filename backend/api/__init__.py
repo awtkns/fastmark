@@ -1,17 +1,18 @@
 from typing import Optional, List
 
-from fastapi import Depends, FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
-from sqlalchemy.orm import Session
+from .config import BaseConfig
+config = BaseConfig()
 
 import dramatiq
 from dramatiq.brokers.rabbitmq import RabbitmqBroker
 from dramatiq.middleware import CurrentMessage
-broker = RabbitmqBroker(host='fastmark_queue', middleware=[CurrentMessage()])
+broker = RabbitmqBroker(host=config.RABBITMQ_HOST, middleware=[CurrentMessage()])
 dramatiq.set_broker(broker)
 
-import uvicorn
 from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from . import models, schemas
