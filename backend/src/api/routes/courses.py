@@ -10,6 +10,7 @@ router = APIRouter()
 @router.post("/courses/", response_model=schemas.Course)
 def add_course(course: schemas.CourseCreate, db: session = Depends(session)):
     db_course = models.Course(**course.dict()).save(db)
+    print(course)
 
     return db_course
 
