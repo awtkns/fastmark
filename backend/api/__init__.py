@@ -1,6 +1,7 @@
 from typing import Optional, List
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
 import uvicorn
@@ -8,20 +9,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from . import models, schemas
-from .database import SessionLocal, engine
+from .database import session, engine
+from .websockets import router
+
 
 models.BaseModel.metadata.create_all(bind=engine)
 app = FastAPI()
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-        db.commit()
-    finally:
-        db.close()
+app.include_router(router)
+# from . import websockets
 
 
 def make_user(db: Session, user: schemas.UserCreate):
@@ -33,11 +28,10 @@ def make_user(db: Session, user: schemas.UserCreate):
 
 
 @app.post("/users/", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def create_user(user: schemas.UserCreate, db: Session = Depends(session)):
     return make_user(db=db, user=user)
 
 
 @app.get("/users/", response_model=List[schemas.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(session)):
     return db.query(models.User).all()
-
