@@ -7,7 +7,7 @@ from .database import BaseModel
 class User(BaseModel):
     __tablename__ = "users"
 
-    email = Column(String, unique=True, index=True)
+    email = Column(String)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
 

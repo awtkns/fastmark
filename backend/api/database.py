@@ -1,36 +1,28 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from inflection import underscore
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
-class Base(object):
+class BaseModel(object):
     id = Column(Integer, primary_key=True, index=True)
 
     @declared_attr
     def __tablename__(self):
         return underscore(self.__name__)
 
-    def save(self):
+    def save(self, session: Session):
         session.add(self)
-        self._flush()
+        self._flush(session)
         return self
 
-    def update(self, **kwargs):
-        for attr, value in kwargs.items():
-            setattr(self, attr, value)
-        return self.save()
-
-    def delete(self):
+    def delete(self, session: Session):
         session.delete(self)
-        self._flush()
+        self._flush(Session)
 
     # noinspection PyMethodMayBeStatic
-    def _flush(self):
+    def _flush(self, session: Session):
         try:
             session.flush()
         except DatabaseError:
@@ -38,7 +30,8 @@ class Base(object):
             raise
 
 
-BaseModel = declarative_base(cls=Base)
-# db.Model.query = SessionLocal.query_property()
-# db.Model.metadata.create_all(bind=db.engine)
-# db.create_all()
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+BaseModel = declarative_base(cls=BaseModel)
