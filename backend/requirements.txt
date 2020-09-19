@@ -1,7 +1,5 @@
-amqp
-dramatiq 
+dramatiq[rabbitmq,watch]
 fastapi
 inflection
-pika
 sqlalchemy
 uvicorn

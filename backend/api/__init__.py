@@ -43,7 +43,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(session)):
 
 @dramatiq.actor
 def identity(x):
-    print("THIS WORKED")
+    print("sadsd")
     return x
 
 
