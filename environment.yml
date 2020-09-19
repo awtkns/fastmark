@@ -1,0 +1,11 @@
+name: FastMark
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - fastapi=0.61.1
+  - inflection=0.5.1
+  - python=3.8.5
+  - sqlalchemy
+  - uvicorn=0.11.3
+
