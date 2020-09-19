@@ -1,24 +1,27 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
 from .database import BaseModel
 
 
-class User(BaseModel):
-    __tablename__ = "users"
-
-    email = Column(String)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-
-    items = relationship("Item", back_populates="owner")
+class Course(BaseModel):
+    d2l_id = Column(String)
+    name = Column(String)
 
 
-class Item(BaseModel):
-    __tablename__ = "items"
+class Assignment(BaseModel):
+    class_id = Column(ForeignKey('course.id'), nullable=False)
+    name = Column(String, unique=True, nullable=False)
+    due_datetime = Column(DateTime)
 
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
 
-    owner = relationship("User", back_populates="items")
+class Student(BaseModel):
+    d2l_id = Column(String)
+    name = Column(String)
+
+
+class Submission(BaseModel):
+    assignment_id = Column(ForeignKey('assignment.id'), nullable=False)
+    student_id = Column(ForeignKey('student.id'), nullable=False)
+    submission_datetime = Column(DateTime)
+    path = Column(String)

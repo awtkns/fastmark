@@ -1,37 +1,48 @@
 from typing import List, Optional
+from datetime import datetime
 
-from pydantic import BaseModel
-
-
-class ItemBase(BaseModel):
-    title: str
-    description: Optional[str] = None
+from pydantic import BaseModel as BaseSchema
 
 
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
+class BaseORMSchema(BaseSchema):
     id: int
-    owner_id: int
 
     class Config:
         orm_mode = True
 
 
-class UserBase(BaseModel):
-    email: str
+class Student(BaseORMSchema):
+    d2l_id: str
+    name: str
 
 
-class UserCreate(UserBase):
-    password: str
+class Course(BaseORMSchema):
+    d2l_id: str
+    name: str
 
 
-class User(UserBase):
-    id: int
-    is_active: bool
-    items: List[Item] = []
+class CourseCreate(BaseSchema):
+    d2l_id: str
+    name: str
 
-    class Config:
-        orm_mode = True
+
+class Assignment(BaseORMSchema):
+    course_id: int
+    d2l_id: str
+    name: str
+    due_database: datetime
+
+
+class AssignmentCreate(BaseSchema):
+    course_id: int
+    d2l_id: str
+    name: str
+    due_database: datetime
+
+
+class AssignmentSubmission(BaseORMSchema):
+    assignment_id: int
+    student_id: int
+    d2l_id: str
+    name: str
+    submission_datetime: datetime
