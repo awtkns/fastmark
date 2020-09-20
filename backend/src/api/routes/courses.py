@@ -1,7 +1,7 @@
 from typing import List
 import shutil
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, File, Form
@@ -60,7 +60,7 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
             d2l_id, name, submission_datetime, *_ = file.split(' - ')
             print(submission_datetime)
             submission_datetime = datetime.strptime(submission_datetime, '%b %d, %Y %I%M %p')
-            print(str(submission_datetime))
+            # late =
 
             if not (student := db.query(models.Student).filter_by(d2l_id=d2l_id).first()):
                 student = models.Student(d2l_id=d2l_id, name=name).save(db)
@@ -69,7 +69,9 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
                 assignment_id=assignment_id,
                 student_id=student.id,
                 path=file,
-                submission_datetime=submission_datetime
+                submission_datetime=submission_datetime,
+                # late=submission_datetime > db_assignment.due_datetime,
+                # pase_due=(submission_datetime + timedelta(days=1)) > db_assignment.due_datetime
             ).save(db)
             print(submission)
 

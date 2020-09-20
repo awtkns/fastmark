@@ -20,6 +20,7 @@ class Submission(BaseORMSchema):
     assignment_id: int
     student_id: int
     submission_datetime: datetime
+    late: bool
 
     student: Student
 

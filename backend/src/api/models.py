@@ -1,5 +1,9 @@
+import datetime
+
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 from .database import BaseModel
 
@@ -29,3 +33,12 @@ class Submission(BaseModel):
     path = Column(String)
 
     student = relationship('Student')
+    assignment = relationship('Assignment')
+
+    @hybrid_property
+    def late(self):
+        return self.submission_datetime > self.assignment.due_datetime
+
+    @hybrid_property
+    def overdue(self):
+        return (self.submission_datetime + timedelta(days=1)) > self.assignment.due_datetime
