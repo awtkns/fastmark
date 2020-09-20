@@ -70,8 +70,6 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
                 student_id=student.id,
                 path=file,
                 submission_datetime=submission_datetime,
-                # late=submission_datetime > db_assignment.due_datetime,
-                # pase_due=(submission_datetime + timedelta(days=1)) > db_assignment.due_datetime
             ).save(db)
             print(submission)
 

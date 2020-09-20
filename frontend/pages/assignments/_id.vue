@@ -1,8 +1,16 @@
 <template>
-  <div>
+  <div v-if="assignment">
     <v-expansion-panels v-model="panel">
       <v-expansion-panel v-for="s in assignment.submissions">
-        <v-expansion-panel-header>{{ s.student.name }}</v-expansion-panel-header>
+        <v-expansion-panel-header>
+          <v-row no-gutters align="center">
+            <span>{{ s.student.name }}</span>
+            <v-spacer/>
+            <v-chip class="mr-2" v-if="s.late" color="error" outlined v-text="'Late'" />
+            <v-chip class="mr-2" v-if="s.overdue" color="error" v-text="'overdue'" />
+          </v-row>
+
+        </v-expansion-panel-header>
         <v-expansion-panel-content>
           Some content
         </v-expansion-panel-content>
