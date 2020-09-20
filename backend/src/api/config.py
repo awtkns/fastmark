@@ -5,6 +5,7 @@ LOCALHOST = '127.0.0.1'
 
 
 class BaseConfig:
+    UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'uploads')
     API_HOST = LOCALHOST
     API_PORT = 5000
     RABBITMQ_HOST = LOCALHOST
@@ -13,6 +14,9 @@ class BaseConfig:
     def __init__(self):
         env_vars = [v for v in os.environ.keys() if (v in vars(BaseConfig)) and not v.startswith('__')]
         [self.apply_env_var(k) for k in env_vars]
+
+        if not os.path.exists(self.UPLOAD_DIR):
+            os.mkdir(self.UPLOAD_DIR)
 
     def apply_env_var(self, env_var) -> None:
         v = os.environ[env_var]
@@ -28,3 +32,6 @@ class BaseConfig:
             print(f'[FAILED] ENV VARIABLE {env_var} MAY PRODUCE AN UNEXPECTED ERROR')
 
         setattr(self, env_var, v)
+
+    def apply_post_initialization_config(self):
+        os.chdir(self.UPLOAD_DIR)

@@ -1,3 +1,5 @@
 .idea
 *.db
 /jenkins/
+/backend/tests/mock_data/
+/backend/src/api/uploads/

@@ -27,20 +27,18 @@ class CourseCreate(BaseSchema):
 
 
 class Assignment(BaseORMSchema):
-    course_id: int
-    d2l_id: str
+    class_id: int
     name: str
-    due_database: datetime
+    due_datetime: datetime
 
 
 class AssignmentCreate(BaseSchema):
-    course_id: int
-    d2l_id: str
+    class_id: int
     name: str
-    due_database: datetime
+    due_datetime: datetime
 
 
-class AssignmentSubmission(BaseORMSchema):
+class Submission(BaseORMSchema):
     assignment_id: int
     student_id: int
     d2l_id: str

@@ -1,3 +1,4 @@
+import os
 from fastapi.testclient import TestClient
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,6 +17,11 @@ def test_get_courses():
 def test_post_course():
     course = schemas.CourseCreate(d2l_id="123", name="test_course")
     response = client.post("/courses/", json=course.dict())
+    assert response.status_code == 200
+
+
+def test_ingest():
+    response = client.post("/ingest", files={"file": ("filename", open('mock_data/a1.zip', "rb"))})
     assert response.status_code == 200
 
 

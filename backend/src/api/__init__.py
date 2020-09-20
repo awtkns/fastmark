@@ -22,8 +22,9 @@ from .websockets import router
 models.BaseModel.metadata.create_all(bind=engine)
 app = FastAPI()
 
-
 from . import routes
+
+config.apply_post_initialization_config()
 
 
 @dramatiq.actor
