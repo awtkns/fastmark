@@ -22,6 +22,7 @@ class Submission(BaseORMSchema):
     d2l_id: str
     name: str
     submission_datetime: datetime
+    student: Student
 
 
 class Course(BaseORMSchema):

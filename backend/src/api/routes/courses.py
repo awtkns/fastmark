@@ -1,6 +1,7 @@
 from typing import List
 import shutil
 import os
+from datetime import datetime
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, File, Form
@@ -34,10 +35,10 @@ def get_assignments(db: session = Depends(session)):
     return db.query(models.Assignment).all()
 
 
-@router.get("/assignments/{assignment_id}", response_model=List[schemas.AssignmentFull])
-def get_assignment_submissions(db: session = Depends(session)):
+@router.get("/assignments/{assignment_id}", response_model=schemas.AssignmentFull)
+def get_assignment_submissions(assignment_id: int, db: session = Depends(session)):
     ass = db.query(models.Assignment).get(assignment_id)
-    print(ass.submissions)
+    print(ass)
     return ass
 
 
@@ -49,8 +50,6 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
     if not os.path.exists(new_folder):
         os.mkdir(new_folder)
 
-    print("HERE")
-
     archive_fp = f'__zip.archive'
     with open(archive_fp, 'wb') as f:
         f.write(file)
@@ -59,6 +58,9 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
     for file in os.listdir(new_folder):
         if file.endswith('.zip'):
             d2l_id, name, submission_datetime, *_ = file.split(' - ')
+            print(submission_datetime)
+            submission_datetime = datetime.strptime(submission_datetime, '%b %d, %Y %I%M %p')
+            print(str(submission_datetime))
 
             if not (student := db.query(models.Student).filter_by(d2l_id=d2l_id).first()):
                 student = models.Student(d2l_id=d2l_id, name=name).save(db)
@@ -66,7 +68,8 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
             submission = models.Submission(
                 assignment_id=assignment_id,
                 student_id=student.id,
-                path=file
+                path=file,
+                submission_datetime=submission_datetime
             ).save(db)
             print(submission)
 
