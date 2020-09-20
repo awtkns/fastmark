@@ -1,6 +1,16 @@
 version: '3.7'
 
 services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: fastmark
+      POSTGRES_PASSWORD: password
+    ports:
+      - 54320:5432
+
   queue:
     image: rabbitmq
     container_name: fastmark_queue
@@ -8,23 +18,27 @@ services:
       - 5672:5672
 
   worker:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: worker.Dockerfile
     command: dramatiq api --watch api
     env_file:
       - docker.env
     depends_on:
       - queue
+      - db
     volumes:
-      - ./backend/api:/app/api
+      - ./backend/src:/app
 
   api:
     build: ./backend
     env_file:
       - docker.env
     depends_on:
+      - queue
+      - db
       - worker
     ports:
       - '5000:5000'
     volumes:
-      - ./backend/api:/app/api
-
+      - ./backend/src:/app

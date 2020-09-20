@@ -4,8 +4,9 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import sessionmaker, Session
 from inflection import underscore
 
-SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://postgres:password@localhost/fastmark?gssencmode=disable"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+from api import config
+
+engine = create_engine(config.POSTGRES_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 html = """
