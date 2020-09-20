@@ -6,6 +6,6 @@ RUN pip install -r requirements.txt
 
 EXPOSE 5000
 
-COPY . .
+COPY ./src .
 
 CMD ["uvicorn", "asgi:application", "--host", "0.0.0.0", "--port", "5000", "--reload"]

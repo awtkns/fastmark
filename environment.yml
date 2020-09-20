@@ -9,4 +9,6 @@ dependencies:
   - sqlalchemy
   - uvicorn=0.11.3
   - dramatiq
+  - python-multipart
+
 
