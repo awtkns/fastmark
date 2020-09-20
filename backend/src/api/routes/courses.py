@@ -50,27 +50,38 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
     if not os.path.exists(new_folder):
         os.mkdir(new_folder)
 
-    archive_fp = f'__zip.archive'
-    with open(archive_fp, 'wb') as f:
+    os.chdir(new_folder)
+    with open('tmp', 'wb') as f:
         f.write(file)
-    shutil.unpack_archive(archive_fp, new_folder, format='zip')
+    shutil.unpack_archive('tmp', format='zip')
 
-    for file in os.listdir(new_folder):
+    files = [f for f in os.listdir('.') if os.path.isfile(f)]
+    for file in files:
         if file.endswith('.zip'):
             d2l_id, name, submission_datetime, *_ = file.split(' - ')
-            print(submission_datetime)
             submission_datetime = datetime.strptime(submission_datetime, '%b %d, %Y %I%M %p')
-            # late =
 
             if not (student := db.query(models.Student).filter_by(d2l_id=d2l_id).first()):
                 student = models.Student(d2l_id=d2l_id, name=name).save(db)
 
-            submission = models.Submission(
+            submission_folder = f"{d2l_id}_{name.replace(' ', '')}"
+            db_submission = models.Submission(
                 assignment_id=assignment_id,
                 student_id=student.id,
-                path=file,
+                path=os.path.abspath(submission_folder),
                 submission_datetime=submission_datetime,
             ).save(db)
-            print(submission)
 
+            os.mkdir(submission_folder)
+            shutil.unpack_archive(file, submission_folder)
+
+            [models.SubmissionFile(
+                submission_id=db_submission.id,
+                filename=f,
+                path=os.path.join(os.path.abspath(submission_folder), f)
+            ).save(db) for f in os.listdir(submission_folder)]
+
+        os.remove(file)
+
+    os.chdir(config.UPLOAD_DIR)
     return {"filename": filename}

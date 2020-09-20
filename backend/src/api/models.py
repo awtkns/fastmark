@@ -34,6 +34,7 @@ class Submission(BaseModel):
 
     student = relationship('Student')
     assignment = relationship('Assignment')
+    files = relationship('SubmissionFile')
 
     @hybrid_property
     def late(self):
@@ -42,3 +43,11 @@ class Submission(BaseModel):
     @hybrid_property
     def overdue(self):
         return self.submission_datetime > (self.assignment.due_datetime + datetime.timedelta(days=1))
+
+
+class SubmissionFile(BaseModel):
+    submission_id = Column(ForeignKey('submission.id'), nullable=False)
+    filename = Column(String)
+    path = Column(String)
+
+

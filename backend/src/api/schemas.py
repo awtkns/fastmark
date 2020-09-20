@@ -16,6 +16,11 @@ class Student(BaseORMSchema):
     name: str
 
 
+class SubmissionFile(BaseORMSchema):
+    filename: str
+    path: str
+
+
 class Submission(BaseORMSchema):
     assignment_id: int
     student_id: int
@@ -24,6 +29,7 @@ class Submission(BaseORMSchema):
     overdue: bool
 
     student: Student
+    files: List[SubmissionFile]
 
 
 class Course(BaseORMSchema):

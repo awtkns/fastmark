@@ -13,7 +13,6 @@ class BaseConfig:
     DOCKER_URI = 'unix://var/run/docker.sock'
 
     def __init__(self):
-        print("INIT CONFIG")
         env_vars = [v for v in os.environ.keys() if (v in vars(BaseConfig)) and not v.startswith('__')]
         [self.apply_env_var(k) for k in env_vars]
 
