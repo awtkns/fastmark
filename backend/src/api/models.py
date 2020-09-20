@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, ARRAY
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -17,6 +17,7 @@ class Assignment(BaseModel):
     # class_id = Column(ForeignKey('course.id'), nullable=False)
     name = Column(String, unique=True, nullable=False)
     due_datetime = Column(DateTime)
+    expected_files = Column(ARRAY(String))
 
     submissions = relationship('Submission')
 

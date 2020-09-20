@@ -24,8 +24,7 @@ def get_courses(db: session = Depends(session)):
 
 @router.post("/assignments/", response_model=schemas.Assignment)
 def add_assignment(assignment: schemas.AssignmentCreate, db: session = Depends(session)):
-    db_assignment = models.Assignment(**assignment.dict()).save(db)
-    print(db_assignment)
+    db_assignment = models.Assignment(expected_files=['fcts.cpp', 'fcts.h'], **assignment.dict()).save(db)
 
     return db_assignment
 
@@ -38,7 +37,6 @@ def get_assignments(db: session = Depends(session)):
 @router.get("/assignments/{assignment_id}", response_model=schemas.AssignmentFull)
 def get_assignment(assignment_id: int, db: session = Depends(session)):
     ass = db.query(models.Assignment).get(assignment_id)
-    print(ass)
     return ass
 
 

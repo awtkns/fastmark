@@ -45,10 +45,11 @@ class CourseCreate(BaseSchema):
 class Assignment(BaseORMSchema):
     name: str
     due_datetime: datetime
+    expected_files: Optional[List[str]] = []
 
 
 class AssignmentFull(Assignment):
-    submissions: List[Submission] = []
+    submissions: Optional[List[Submission]] = []
 
 
 class AssignmentCreate(BaseSchema):
