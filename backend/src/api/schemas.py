@@ -21,6 +21,7 @@ class Submission(BaseORMSchema):
     student_id: int
     submission_datetime: datetime
     late: bool
+    overdue: bool
 
     student: Student
 

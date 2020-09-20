@@ -41,4 +41,4 @@ class Submission(BaseModel):
 
     @hybrid_property
     def overdue(self):
-        return (self.submission_datetime + timedelta(days=1)) > self.assignment.due_datetime
+        return self.submission_datetime > (self.assignment.due_datetime + datetime.timedelta(days=1))
