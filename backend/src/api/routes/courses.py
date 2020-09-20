@@ -24,6 +24,7 @@ def get_courses(db: session = Depends(session)):
 @router.post("/assignments/", response_model=schemas.Assignment)
 def add_assignment(assignment: schemas.AssignmentCreate, db: session = Depends(session)):
     db_assignment = models.Assignment(**assignment.dict()).save(db)
+    print(db_assignment)
 
     return db_assignment
 

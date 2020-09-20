@@ -10,7 +10,7 @@ class Course(BaseModel):
 
 
 class Assignment(BaseModel):
-    class_id = Column(ForeignKey('course.id'), nullable=False)
+    # class_id = Column(ForeignKey('course.id'), nullable=False)
     name = Column(String, unique=True, nullable=False)
     due_datetime = Column(DateTime)
 

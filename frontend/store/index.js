@@ -6,7 +6,8 @@ export const state = () => ({
 
 
 export const mutations = {
-  setAssignments: (state, assignments) => (state.assignments = assignments)
+  setAssignments: (state, assignments) => state.assignments = assignments,
+  addAssignment: (state, assignment) => state.assignments.push(assignment)
 }
 
 export const actions = {
@@ -14,7 +15,6 @@ export const actions = {
     commit('setAssignments', await generic_get(this, 'assignments'))
   },
   async addAssignment({ commit }, assignment) {
-    console.log(assignment)
-    commit('setAssignments', await generic_post(this, '/assignments/', {'name': assignment.name}))
+    commit('addAssignment', await generic_post(this, '/assignments/', assignment))
   }
 }
