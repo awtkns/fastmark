@@ -54,8 +54,11 @@ export default {
   methods: {
     async submit() {
       this.$store.dispatch('addAssignment', {
-        'name': this.assignment.name,
-        'due_datetime': '2020-09-20T04:01:10.780Z'
+        assignment: {
+          'name': this.assignment.name,
+          'due_datetime': '2020-09-20T04:01:10.780Z'
+        },
+        file: this.assignment.file
       })
       // await uploadAssignmentFile(this, this.assignment.file, 1)
     }
