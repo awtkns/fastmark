@@ -27,3 +27,5 @@ class Submission(BaseModel):
     student_id = Column(ForeignKey('student.id'), nullable=False)
     submission_datetime = Column(DateTime)
     path = Column(String)
+
+    student = relationship('Student')
