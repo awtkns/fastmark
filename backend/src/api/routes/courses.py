@@ -34,8 +34,15 @@ def get_assignments(db: session = Depends(session)):
     return db.query(models.Assignment).all()
 
 
+@router.get("/assignments/{assignment_id}", response_model=List[schemas.AssignmentFull])
+def get_assignment_submissions(db: session = Depends(session)):
+    ass = db.query(models.Assignment).get(assignment_id)
+    print(ass.submissions)
+    return ass
+
+
 @router.post("/ingest")
-async def create_upload_file(file: bytes = File(...), filename: str = Form(...), assignment_id: int = Form(...)):
+async def create_upload_file(file: bytes = File(...), filename: str = Form(...), assignment_id: int = Form(...), db: session = Depends(session)):
     db_assignment = db.query(models.Assignment).get(assignment_id)
 
     new_folder = db_assignment.name

@@ -8,20 +8,26 @@ app.add_middleware(CORSMiddleware)
 client = TestClient(app)
 
 
-def test_get_courses():
-    response = client.get("/courses")
+# def test_get_courses():
+#     response = client.get("/courses")
+#     assert response.status_code == 200
+#     return response.json()
+#
+#
+# def test_post_course():
+#     course = schemas.CourseCreate(d2l_id="123", name="test_course")
+#     response = client.post("/courses/", json=course.dict())
+#     assert response.status_code == 200
+
+
+def test_get_assignments():
+    response = client.get("/assignments/")
     assert response.status_code == 200
     return response.json()
 
 
-def test_post_course():
-    course = schemas.CourseCreate(d2l_id="123", name="test_course")
-    response = client.post("/courses/", json=course.dict())
-    assert response.status_code == 200
 
 
-def test_ingest():
-    response = client.post("/ingest", files={"file": ("filename", open('mock_data/a1.zip', "rb"))})
-    assert response.status_code == 200
+
 
 

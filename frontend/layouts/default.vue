@@ -15,7 +15,7 @@
       <v-divider></v-divider>
 
       <v-list dense nav>
-        <v-list-item v-for="a in assignments" :key="a.id" link>
+        <v-list-item v-for="a in assignments" :key="a.id" :to="`/assignments/${a.id}`">
           <v-list-item-content>
             <v-list-item-title>{{ a.name }}</v-list-item-title>
           </v-list-item-content>

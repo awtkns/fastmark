@@ -16,6 +16,14 @@ class Student(BaseORMSchema):
     name: str
 
 
+class Submission(BaseORMSchema):
+    assignment_id: int
+    student_id: int
+    d2l_id: str
+    name: str
+    submission_datetime: datetime
+
+
 class Course(BaseORMSchema):
     d2l_id: str
     name: str
@@ -31,15 +39,12 @@ class Assignment(BaseORMSchema):
     due_datetime: datetime
 
 
+class AssignmentFull(Assignment):
+    submissions: List[Submission] = []
+
+
 class AssignmentCreate(BaseSchema):
     # class_id: int
     name: str
     due_datetime: datetime
 
-
-class Submission(BaseORMSchema):
-    assignment_id: int
-    student_id: int
-    d2l_id: str
-    name: str
-    submission_datetime: datetime

@@ -14,6 +14,8 @@ class Assignment(BaseModel):
     name = Column(String, unique=True, nullable=False)
     due_datetime = Column(DateTime)
 
+    submissions = relationship('Submission')
+
 
 class Student(BaseModel):
     d2l_id = Column(String)
