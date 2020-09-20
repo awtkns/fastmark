@@ -36,7 +36,7 @@ def get_assignments(db: session = Depends(session)):
 
 
 @router.get("/assignments/{assignment_id}", response_model=schemas.AssignmentFull)
-def get_assignment_submissions(assignment_id: int, db: session = Depends(session)):
+def get_assignment(assignment_id: int, db: session = Depends(session)):
     ass = db.query(models.Assignment).get(assignment_id)
     print(ass)
     return ass

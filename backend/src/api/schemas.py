@@ -19,9 +19,8 @@ class Student(BaseORMSchema):
 class Submission(BaseORMSchema):
     assignment_id: int
     student_id: int
-    d2l_id: str
-    name: str
     submission_datetime: datetime
+
     student: Student
 
 
