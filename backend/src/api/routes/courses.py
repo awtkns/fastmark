@@ -3,7 +3,7 @@ import shutil
 import os
 
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form
 from api import schemas, session, models, config
 
 router = APIRouter()
@@ -34,7 +34,7 @@ def get_assignments(db: session = Depends(session)):
 
 
 @router.post("/ingest")
-async def create_upload_file(file: bytes = File(...), filename: str = "zip.zip", assignment_id: int = 0, db: session = Depends(session)):
+async def create_upload_file(file: bytes = File(...), filename: str = Form(...), assignment_id: int = Form(...)):
     db_assignment = db.query(models.Assignment).get(assignment_id)
 
     new_folder = db_assignment.name
