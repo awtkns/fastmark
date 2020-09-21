@@ -40,21 +40,31 @@ def get_assignment(assignment_id: int, db: session = Depends(session)):
     return ass
 
 
+@router.post("/submissions/{submission_id}")
+def build_submission(submission_id):
+    print("building submission", submission_id)
+    return f'build_submission {submission_id}'
+
+
 @router.post("/ingest")
 async def create_upload_file(file: bytes = File(...), filename: str = Form(...), assignment_id: int = Form(...), db: session = Depends(session)):
     db_assignment = db.query(models.Assignment).get(assignment_id)
 
-    new_folder = db_assignment.name
-    if not os.path.exists(new_folder):
-        os.mkdir(new_folder)
+    os.chdir(config.UPLOAD_DIR)
+    assignment_folder = os.path.join(config.UPLOAD_DIR, db_assignment.name)
 
-    os.chdir(new_folder)
+    assert not os.path.exists(assignment_folder), 'Folder already exists!'
+    os.mkdir(assignment_folder)
+
     with open('tmp', 'wb') as f:
         f.write(file)
-    shutil.unpack_archive('tmp', format='zip')
+    shutil.unpack_archive('tmp', extract_dir=assignment_folder, format='zip')
 
-    files = [f for f in os.listdir('.') if os.path.isfile(f)]
-    for file in files:
+    os.chdir(assignment_folder)
+    for file in os.listdir(assignment_folder):
+        if os.path.isdir(file):
+            break
+
         if file.endswith('.zip'):
             d2l_id, name, submission_datetime, *_ = file.split(' - ')
             submission_datetime = datetime.strptime(submission_datetime, '%b %d, %Y %I%M %p')
@@ -62,24 +72,24 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
             if not (student := db.query(models.Student).filter_by(d2l_id=d2l_id).first()):
                 student = models.Student(d2l_id=d2l_id, name=name).save(db)
 
-            submission_folder = f"{d2l_id}_{name.replace(' ', '')}"
+            submission_folder = os.path.join(assignment_folder, f"{d2l_id}_{name.replace(' ', '')}")
             db_submission = models.Submission(
                 assignment_id=assignment_id,
                 student_id=student.id,
-                path=os.path.abspath(submission_folder),
+                path=submission_folder,
                 submission_datetime=submission_datetime,
             ).save(db)
 
             os.mkdir(submission_folder)
-            shutil.unpack_archive(file, submission_folder)
+            shutil.unpack_archive(file, extract_dir=submission_folder)
 
             [models.SubmissionFile(
                 submission_id=db_submission.id,
                 filename=f,
-                path=os.path.join(os.path.abspath(submission_folder), f)
+                path=os.path.join(submission_folder, f)
             ).save(db) for f in os.listdir(submission_folder)]
 
         os.remove(file)
-
     os.chdir(config.UPLOAD_DIR)
+
     return {"filename": filename}
