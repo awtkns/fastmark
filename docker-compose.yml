@@ -28,7 +28,8 @@ services:
       - queue
       - db
     volumes:
-      - ./backend/src:/app
+      - ./backend/src/api:/app/api
+      - ./uploads:/app/uploads
 
   api:
     build: ./backend
@@ -41,4 +42,4 @@ services:
     ports:
       - '5000:5000'
     volumes:
-      - ./backend/src:/app
+      - ./uploads:/app/uploads

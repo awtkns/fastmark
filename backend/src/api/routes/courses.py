@@ -50,18 +50,16 @@ def build_submission(submission_id):
 async def create_upload_file(file: bytes = File(...), filename: str = Form(...), assignment_id: int = Form(...), db: session = Depends(session)):
     db_assignment = db.query(models.Assignment).get(assignment_id)
 
-    os.chdir(config.UPLOAD_DIR)
-    assignment_folder = os.path.join(config.UPLOAD_DIR, db_assignment.name)
-
-    assert not os.path.exists(assignment_folder), 'Folder already exists!'
-    os.mkdir(assignment_folder)
+    if not os.path.exists(assignment_folder := db_assignment.path):
+        os.mkdir(assignment_folder)
 
     with open('tmp', 'wb') as f:
         f.write(file)
     shutil.unpack_archive('tmp', extract_dir=assignment_folder, format='zip')
 
-    os.chdir(assignment_folder)
     for file in os.listdir(assignment_folder):
+        fp = os.path.join(assignment_folder, file)
+
         if os.path.isdir(file):
             break
 
@@ -72,24 +70,23 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
             if not (student := db.query(models.Student).filter_by(d2l_id=d2l_id).first()):
                 student = models.Student(d2l_id=d2l_id, name=name).save(db)
 
-            submission_folder = os.path.join(assignment_folder, f"{d2l_id}_{name.replace(' ', '')}")
             db_submission = models.Submission(
                 assignment_id=assignment_id,
                 student_id=student.id,
-                path=submission_folder,
                 submission_datetime=submission_datetime,
             ).save(db)
 
-            os.mkdir(submission_folder)
-            shutil.unpack_archive(file, extract_dir=submission_folder)
+            os.mkdir(submission_folder := db_submission.path)
+            print(fp)
+            print(os.listdir('.'))
+            shutil.unpack_archive(fp, extract_dir=submission_folder)
 
             [models.SubmissionFile(
                 submission_id=db_submission.id,
                 filename=f,
-                path=os.path.join(submission_folder, f)
+                path=os.path.relpath(os.path.join(submission_folder, filename), config.UPLOAD_DIR)
             ).save(db) for f in os.listdir(submission_folder)]
 
-        os.remove(file)
-    os.chdir(config.UPLOAD_DIR)
+        os.remove(fp)
 
     return {"filename": filename}

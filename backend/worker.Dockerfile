@@ -12,6 +12,7 @@ RUN apt-get update \
     python3-pip \
   && apt-get clean
 
+WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
