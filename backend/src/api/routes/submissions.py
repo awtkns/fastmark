@@ -19,13 +19,15 @@ def is_build_artifact(filename):
 
 
 @dramatiq.actor
-def test_submission(build_result_id, job_id):
+def test_submission(build_result_id: int, job_id: int):
     with worker_session() as db:
         if not (build := db.query(models.BuildResult).get(build_result_id)):
             print(f'[Test ERROR] Build Result {build_result_id} DNE')
             return
 
-        print(f'[Test {build.submission.student.name}] Test submission in {os.getcwd()}')
+        student_name = build.submission.student.name
+
+        print(f'[Test {student_name}] Test submission in {os.getcwd()}')
         if job := db.query(models.ActiveJob).get(job_id):
             job.status = 'testing'
             job.save(db)
@@ -34,19 +36,25 @@ def test_submission(build_result_id, job_id):
 
     # Long Running Task
     report_name = 'report.json'
-    process = subprocess.run([f'./fcts_unittest --gtest_output="json:{report_name}"'], capture_output=True, text=True, shell=True)
+    with open('stdout.log', 'w') as stdout, open('stderr.log', 'w') as stderr:
+        process = subprocess.run(
+            [f'./fcts_unittest --gtest_output="json:{report_name}"'],
+            stdout=stdout,
+            stderr=stderr,
+            shell=True
+        )
 
     with worker_session() as db:
         result = models.TestResult(
             build_result_id=build_result_id,
             exit_code=process.returncode,
-            error_message=process.stderr
+            # error_message=process.stderr
         )
 
         if job := db.query(models.ActiveJob).get(job_id):
             job.delete(db)
 
-        print(f'[Test {build.submission.student.name}] Test return with exit code {results.exit_code}')
+        print(f'[Test {student_name}] Returned with exit code {result.exit_code}')
         if result.exit_code == 0:
             assert os.path.exists(report_name)
 
@@ -61,7 +69,7 @@ def test_submission(build_result_id, job_id):
 
 
 @dramatiq.actor
-def build_submission(submission_id, job_id):
+def build_submission(submission_id: int, job_id: int):
 
     with worker_session() as db:
         if not (submission := db.query(models.Submission).get(submission_id)):
@@ -96,23 +104,29 @@ def build_submission(submission_id, job_id):
         if result.exit_code == 0:
 
             if job := db.query(models.ActiveJob).get(job_id):
-                job.status = 'queued for test'
+                job.status = 'queued'
+                job.type = 'test'
                 job.save(db)
+
+            db.commit()
             test_submission.send_with_options(args=(result.id, job_id))
         else:
             if job := db.query(models.ActiveJob).get(job_id):
                 job.delete(db)
 
 
+def start_job(submission: models.Submission, db: Session):
+    job = models.ActiveJob(
+        name=submission.student.name,
+        type='build'
+    ).save(db)
+
+    build_submission.send_with_options(args=(submission.id, job.id,), priority=10)
+
+
 @router.post("/submissions/")
 def build_all_submissions_route(db: Session = Depends(session)):
-    for s in db.query(models.Submission).all():
-        job = models.ActiveJob(
-            name=s.student.name,
-            type='build'
-        ).save(db)
-
-        build_submission.send_with_options(args=(s.id, job.id,))
+    [start_job(s, db) for s in db.query(models.Submission).all()]
 
     return 'ok'
 
@@ -120,11 +134,6 @@ def build_all_submissions_route(db: Session = Depends(session)):
 @router.post("/submissions/{submission_id}")
 def build_submission_route(submission_id, db: Session = Depends(session)):
     if submission := db.query(models.Submission).get(submission_id):
-        job = models.ActiveJob(
-            name=submission.student.name,
-            type='build'
-        ).save(db)
-
-        build_submission.send_with_options(args=(submission_id, job.id,))
+        start_job(submission, db)
 
     return 'ok'
