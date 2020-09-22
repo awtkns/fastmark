@@ -21,7 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: worker.Dockerfile
-    command: dramatiq api --watch api
+    command: dramatiq api --watch .
     env_file:
       - docker.env
     depends_on:
@@ -29,17 +29,17 @@ services:
       - db
     volumes:
       - ./backend/src/api:/app/api
-      - ./uploads:/app/uploads
+      - ./backend/src/uploads:/app/uploads
 
-  api:
-    build: ./backend
-    env_file:
-      - docker.env
-    depends_on:
-      - queue
-      - db
-      - worker
-    ports:
-      - '5000:5000'
-    volumes:
-      - ./uploads:/app/uploads
+#  api:
+#    build: ./backend
+#    env_file:
+#      - docker.env
+#    depends_on:
+#      - queue
+#      - db
+#      - worker
+#    ports:
+#      - '5000:5000'
+#    volumes:
+#      - ./uploads:/app/uploads

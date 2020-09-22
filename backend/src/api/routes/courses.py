@@ -40,10 +40,11 @@ def get_assignment(assignment_id: int, db: session = Depends(session)):
     return ass
 
 
-@router.post("/submissions/{submission_id}")
-def build_submission(submission_id):
-    print("building submission", submission_id)
-    return f'build_submission {submission_id}'
+def delete_makefile(path):
+    if ret := path.lower().endswith('makefile'):
+        os.remove(path)
+
+    return ret
 
 
 @router.post("/ingest")
@@ -58,7 +59,7 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
     shutil.unpack_archive('tmp', extract_dir=assignment_folder, format='zip')
 
     for file in os.listdir(assignment_folder):
-        fp = os.path.join(assignment_folder, file)
+        zip_path = os.path.join(assignment_folder, file)
 
         if os.path.isdir(file):
             break
@@ -77,16 +78,14 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
             ).save(db)
 
             os.mkdir(submission_folder := db_submission.path)
-            print(fp)
-            print(os.listdir('.'))
-            shutil.unpack_archive(fp, extract_dir=submission_folder)
+            shutil.unpack_archive(zip_path, extract_dir=submission_folder)
 
             [models.SubmissionFile(
                 submission_id=db_submission.id,
                 filename=f,
-                path=os.path.relpath(os.path.join(submission_folder, filename), config.UPLOAD_DIR)
-            ).save(db) for f in os.listdir(submission_folder)]
+                path=os.path.relpath(p, config.UPLOAD_DIR)
+            ).save(db) for f in os.listdir(submission_folder) if not delete_makefile(p := os.path.join(submission_folder, f))]
 
-        os.remove(fp)
+        os.remove(zip_path)
 
     return {"filename": filename}
