@@ -39,7 +39,7 @@ class Submission(BaseModel):
     student = relationship('Student')
     assignment = relationship('Assignment')
     files = relationship('SubmissionFile', backref="submission")
-    build_result = relationship('BuildResult', backref="submission")
+    build_result = relationship('BuildResult', backref="submission", uselist=False)
 
     @hybrid_property
     def late(self):
@@ -72,7 +72,7 @@ class BuildResult(BaseModel):
     exit_code = Column(Integer)
     error_message = Column(String)
 
-    test = relationship('TestResult')
+    test_result = relationship('TestResult', uselist=False)
 
 
 class SubmissionFile(BaseModel):

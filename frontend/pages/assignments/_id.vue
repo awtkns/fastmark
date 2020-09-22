@@ -25,6 +25,9 @@
             <v-col cols="12">
               <v-btn text @click="buildSubmission(s)">Build</v-btn>
             </v-col>
+            <v-col cols="12">
+              {{ s }}
+            </v-col>
           </v-row>
         </v-expansion-panel-content>
       </v-expansion-panel>
