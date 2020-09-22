@@ -16,12 +16,24 @@
               v-text="'Missing files'"
               outlined
             />
+            <v-icon v-if="s.build_result && s.build_result.test_result" v-text="'mdi-check'" color="success" />
           </v-row>
 
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-row>
             <v-col cols="12"><v-chip dark v-for="f in s.files" v-text="f.filename" class="mx-1"/></v-col>
+            <v-col v-if="!s.build_result" cols="12" class="text-h4 text-center">
+              Submission has yet to be built.
+            </v-col>
+            <v-col v-else-if="s.build_result.test_result" cols="12">
+              {{ s.build_result.test_result }}
+            </v-col>
+            <v-col v-else cols="12">
+              <span>Build Results</span>
+              {{ s.build_result }}
+            </v-col>
+
             <v-col cols="12">
               <v-btn text @click="buildSubmission(s)">Build</v-btn>
             </v-col>
