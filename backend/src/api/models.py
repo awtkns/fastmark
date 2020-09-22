@@ -39,6 +39,7 @@ class Submission(BaseModel):
     student = relationship('Student')
     assignment = relationship('Assignment')
     files = relationship('SubmissionFile', backref="submission")
+    build_result = relationship('BuildResult', backref="submission")
 
     @hybrid_property
     def late(self):
@@ -51,6 +52,27 @@ class Submission(BaseModel):
     @property
     def path(self):
         return os.path.join(self.assignment.path, f"{self.student.d2l_id}_{self.student.name.replace(' ', '')}")
+
+
+class BuildResult(BaseModel):
+    submission_id = Column(ForeignKey('submission.id'), nullable=False, unique=True)
+    exit_code = Column(Integer, nullable=False)
+    error_message = Column(String)
+
+    test_result = relationship('TestResult')
+
+
+class TestResult(BaseModel):
+    build_result_id = Column(ForeignKey('build_result.id'), nullable=False, unique=True)
+    exit_code = Column(Integer, nullable=False)
+    error_message = Column(String)
+
+    total_tests = Column(Integer)
+    total_failures = Column(Integer)
+    total_errors = Column(Integer)
+
+    json_report_path = Column(String)
+    error_report_path = Column(String)
 
 
 class SubmissionFile(BaseModel):

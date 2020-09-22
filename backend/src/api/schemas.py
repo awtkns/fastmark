@@ -16,6 +16,26 @@ class Student(BaseORMSchema):
     name: str
 
 
+class TestResult(BaseORMSchema):
+    build_result_id: int
+    exit_code: int
+
+    error_message: Optional[str]
+    total_tests: Optional[int]
+    total_errors: Optional[int]
+    total_failures: Optional[int]
+    json_report_path: Optional[str]
+    error_report_path: Optional[str]
+
+
+class BuildResult(BaseORMSchema):
+    submission_id: int
+    exit_code: int
+
+    error_message: Optional[str]
+    test_result: Optional[TestResult] = None
+
+
 class SubmissionFile(BaseORMSchema):
     filename: str
     path: str
