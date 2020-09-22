@@ -19,7 +19,7 @@ class Assignment(BaseModel):
     name = Column(String, unique=True, nullable=False)
     due_datetime = Column(DateTime)
     expected_files = Column(ARRAY(String))
-    submissions = relationship('Submission')
+    submissions = relationship('Submission', backref="assignment", cascade="all,delete,delete-orphan")
 
     @property
     def path(self):
@@ -37,8 +37,7 @@ class Submission(BaseModel):
     submission_datetime = Column(DateTime)
 
     student = relationship('Student')
-    assignment = relationship('Assignment')
-    files = relationship('SubmissionFile', backref="submission")
+    files = relationship('SubmissionFile', backref="submission", cascade="all,delete,delete-orphan")
     build_result = relationship('BuildResult', backref="submission", uselist=False)
 
     @hybrid_property
@@ -76,7 +75,7 @@ class BuildResult(BaseModel):
 
 
 class SubmissionFile(BaseModel):
-    submission_id = Column(ForeignKey('submission.id'), nullable=False)
+    submission_id = Column(ForeignKey('submission.id', ondelete='CASCADE'), nullable=False)
     filename = Column(String, nullable=False)
     path = Column(String, nullable=False)
 
