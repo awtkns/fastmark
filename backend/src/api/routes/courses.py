@@ -40,6 +40,14 @@ def get_assignment(assignment_id: int, db: session = Depends(session)):
     return ass
 
 
+@router.delete("/assignments/{assignment_id}")
+def delete_assignment(assignment_id: int, db: session = Depends(session)):
+    if assignment := db.query(models.Assignment).get(assignment_id):
+        assignment.delete(db)
+
+    return 'Deleted'
+
+
 def delete_makefile(path):
     if ret := path.lower().endswith('makefile'):
         os.remove(path)

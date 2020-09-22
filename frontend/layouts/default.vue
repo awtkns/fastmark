@@ -1,7 +1,11 @@
 <template>
   <v-app>
+    <v-app-bar color="deep-purple accent-4" dense dark app>
+      <v-app-bar-nav-icon @click="nav = !nav"/>
+      <span class="title">FastMark</span>
+    </v-app-bar>
 
-    <v-navigation-drawer app permanent>
+    <v-navigation-drawer v-model="nav" app>
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="title">
@@ -11,6 +15,7 @@
             Assignments
           </v-list-item-subtitle>
         </v-list-item-content>
+
       </v-list-item>
       <v-divider></v-divider>
 
@@ -29,6 +34,8 @@
       </template>
     </v-navigation-drawer>
 
+
+
     <v-main>
       <v-container>
         <nuxt />
@@ -44,6 +51,9 @@ import FAssignment from "../components/f-assignment";
 
 export default {
   components: {FAssignment},
+  data: () => ({
+    nav: false
+  }),
   computed: {
     ...mapState(['assignments'])
   },
