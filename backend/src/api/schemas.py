@@ -33,7 +33,7 @@ class BuildResult(BaseORMSchema):
     exit_code: int
 
     error_message: Optional[str]
-    test_results: Optional[List[TestResult]] = []
+    test_result: Optional[TestResult] = None
 
 
 class SubmissionFile(BaseORMSchema):
@@ -50,7 +50,7 @@ class Submission(BaseORMSchema):
 
     student: Student
     files: List[SubmissionFile]
-    build_results: Optional[List[TestResult]] = []
+    build_result: Optional[BuildResult] = None
 
 
 class Course(BaseORMSchema):
