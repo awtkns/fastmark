@@ -77,7 +77,7 @@ class BaseModel(object):
 
     def delete(self, session: Session):
         session.delete(self)
-        self._flush(Session)
+        self._flush(session)
 
     # noinspection PyMethodMayBeStatic
     def _flush(self, session: Session):
@@ -86,4 +86,6 @@ class BaseModel(object):
         except DatabaseError:
             session.rollback()
             raise
+
+
 BaseModel = declarative_base(cls=BaseModel)

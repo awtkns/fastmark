@@ -72,7 +72,7 @@ class BuildResult(BaseModel):
     exit_code = Column(Integer)
     error_message = Column(String)
 
-    test_result = relationship('TestResult', uselist=False)
+    test_result = relationship('TestResult', cascade="all,delete,delete-orphan", uselist=False)
 
 
 class SubmissionFile(BaseModel):

@@ -50,6 +50,13 @@ def build_submission(submission_id):
 
     db = next(session())
     submission = db.query(models.Submission).get(submission_id)
+    print(submission.build_result)
+
+    if build := submission.build_result:
+        print(build)
+        build.delete(db)
+        db.commit()
+
     shutil.copyfile('Makefile', os.path.join(submission.path, 'Makefile'))
 
     os.chdir(submission.path)
