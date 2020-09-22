@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -52,6 +54,16 @@ html = """
     </body>
 </html>
 """
+
+
+@contextmanager
+def worker_session():
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    finally:
+        session.close()
 
 
 def session():
