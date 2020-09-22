@@ -1,6 +1,10 @@
 <template>
   <div v-if="assignment">
-    <span class="text-h1" v-text="assignment.name" style="text-transform: capitalize" />
+    <v-row align="end" no-gutters class="mb-8">
+      <span class="text-h1" v-text="assignment.name" style="text-transform: capitalize" />
+      <v-spacer />
+      <v-btn text outlined @click="buildAll">Build All</v-btn>
+    </v-row>
 
     <v-expansion-panels v-model="panel">
       <v-expansion-panel v-for="s in assignment.submissions">
@@ -69,6 +73,10 @@ export default {
     },
     async buildSubmission(submission) {
       let r = await generic_post(this, `/submissions/${submission.id}`)
+      console.log(r)
+    },
+    async buildAll() {
+      let r = await generic_post(this, `/submissions/`)
       console.log(r)
     }
   }

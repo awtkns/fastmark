@@ -80,3 +80,8 @@ class SubmissionFile(BaseModel):
     filename = Column(String, nullable=False)
     path = Column(String, nullable=False)
 
+
+class ActiveJob(BaseModel):
+    name = Column(String)
+    type = Column(String, nullable=False)
+    status = Column(String, default='queued')
