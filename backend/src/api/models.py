@@ -32,8 +32,8 @@ class Student(BaseModel):
 
 
 class Submission(BaseModel):
-    assignment_id = Column(ForeignKey('assignment.id'), nullable=False)
-    student_id = Column(ForeignKey('student.id'), nullable=False)
+    assignment_id = Column(ForeignKey('assignment.id', ondelete='CASCADE'), nullable=False)
+    student_id = Column(ForeignKey('student.id', ondelete='CASCADE'), nullable=False)
     submission_datetime = Column(DateTime)
 
     student = relationship('Student')
@@ -54,16 +54,8 @@ class Submission(BaseModel):
         return os.path.join(self.assignment.path, f"{self.student.d2l_id}_{self.student.name.replace(' ', '')}")
 
 
-class BuildResult(BaseModel):
-    submission_id = Column(ForeignKey('submission.id'), nullable=False, unique=True)
-    exit_code = Column(Integer, nullable=False)
-    error_message = Column(String)
-
-    test_result = relationship('TestResult')
-
-
 class TestResult(BaseModel):
-    build_result_id = Column(ForeignKey('build_result.id'), nullable=False, unique=True)
+    build_result_id = Column(ForeignKey('build_result.id', ondelete='CASCADE'), nullable=False, unique=True)
     exit_code = Column(Integer, nullable=False)
     error_message = Column(String)
 
@@ -75,7 +67,16 @@ class TestResult(BaseModel):
     error_report_path = Column(String)
 
 
+class BuildResult(BaseModel):
+    submission_id = Column(ForeignKey('submission.id', ondelete='CASCADE'), unique=True)
+    exit_code = Column(Integer)
+    error_message = Column(String)
+
+    test = relationship('TestResult')
+
+
 class SubmissionFile(BaseModel):
     submission_id = Column(ForeignKey('submission.id'), nullable=False)
     filename = Column(String, nullable=False)
     path = Column(String, nullable=False)
+
