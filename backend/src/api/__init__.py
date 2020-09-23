@@ -13,8 +13,6 @@ from fastapi import FastAPI
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
 
 from . import models, schemas
 from .database import session, engine
@@ -33,15 +31,3 @@ app.add_middleware(
 from . import routes
 
 config.apply_post_initialization_config()
-
-
-@dramatiq.actor
-def identity(x):
-    print("sadsd")
-    return x
-
-
-@app.get('/actor')
-def do_actor():
-    identity.send_with_options(args=(42,))
-    return 'success'
