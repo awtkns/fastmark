@@ -81,8 +81,8 @@ export default {
           'name': this.assignment.name,
           'due_datetime': new Date(`${this.assignment.dueDate} ${this.assignment.dueTime}`).toISOString()
         },
-        submissions: this.assignment.file,
-        solution: this.assignment.file
+        submissions: this.assignment.submissions,
+        solution: this.assignment.solution
       })
       // await uploadAssignmentFile(this, this.assignment.file, 1)
     }

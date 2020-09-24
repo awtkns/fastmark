@@ -22,9 +22,6 @@ def get_courses(db: session = Depends(session)):
     return db.query(models.Course).all()
 
 
-
-
-
 def delete_makefile(path):
     if ret := path.lower().endswith('makefile'):
         os.remove(path)
@@ -49,6 +46,7 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
         if os.path.isdir(file):
             break
 
+        # Students Folders
         if file.endswith('.zip'):
             d2l_id, name, submission_datetime, *_ = file.split(' - ')
             submission_datetime = datetime.strptime(submission_datetime, '%b %d, %Y %I%M %p')
@@ -64,6 +62,15 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
 
             os.mkdir(submission_folder := db_submission.path)
             shutil.unpack_archive(zip_path, extract_dir=submission_folder)
+
+            for cur_dir, _, files in os.walk(submission_folder):
+                if cur_dir == submission_folder:
+                    continue
+
+                [shutil.move(os.path.join(cur_dir, f), os.path.join(submission_folder, f)) for f in files]
+
+            # Cleaning up
+            [os.rmdir(dir_) for dir_ in os.listdir(submission_folder) if os.path.isdir(dir_)]
 
             [models.SubmissionFile(
                 submission_id=db_submission.id,
