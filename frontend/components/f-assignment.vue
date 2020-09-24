@@ -65,7 +65,7 @@
 export default {
   name: "f-assignment",
   data: () => ({
-    dialog: true,
+    dialog: false,
     assignment: {
       name: undefined,
       dueDate: new Date().toLocaleDateString("en-US"),
