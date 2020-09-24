@@ -22,9 +22,33 @@
             <v-col cols="12" sm="6">
               <v-text-field v-model="assignment.dueTime" label="Due Time" type="time" suffix="PST" />
             </v-col>
-            <v-col cols="12">
-              <v-file-input v-model="assignment.file" accept=".zip" label="D2L Submission ZIP" />
+            <v-col cols="6">
+              <v-file-input
+                v-model="assignment.submissions"
+                accept=".zip"
+                label="D2L Submission ZIP"
+                append-icon="mdi-file"
+                prepend-icon="" />
             </v-col>
+            <v-col cols="6">
+              <v-file-input
+                v-model="assignment.solution"
+                accept=".zip"
+                label="Solution Key"
+                append-icon="mdi-file"
+                prepend-icon="" />
+            </v-col>
+<!--            <v-col cols="12">-->
+<!--              <v-combobox-->
+<!--                label="Expected Files Names"-->
+<!--                chips-->
+<!--                multiple-->
+<!--                disable-lookup-->
+<!--                :delimiters="[',',' ',';']"-->
+<!--                deletable-chips-->
+<!--                counter-->
+<!--              />-->
+<!--            </v-col>-->
           </v-row>
         </v-container>
       </v-card-text>
@@ -41,12 +65,13 @@
 export default {
   name: "f-assignment",
   data: () => ({
-    dialog: false,
+    dialog: true,
     assignment: {
       name: undefined,
       dueDate: new Date().toLocaleDateString("en-US"),
       dueTime: '22:00',
-      file: undefined
+      submissions: undefined,
+      solution: undefined
     }
   }),
   methods: {
@@ -54,9 +79,10 @@ export default {
       this.$store.dispatch('addAssignment', {
         assignment: {
           'name': this.assignment.name,
-          'due_datetime': '2020-09-20T04:01:10.780Z'
+          'due_datetime': new Date(`${this.assignment.dueDate} ${this.assignment.dueTime}`).toISOString()
         },
-        file: this.assignment.file
+        submissions: this.assignment.file,
+        solution: this.assignment.file
       })
       // await uploadAssignmentFile(this, this.assignment.file, 1)
     }

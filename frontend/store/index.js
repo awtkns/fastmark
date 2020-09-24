@@ -16,18 +16,21 @@ export const mutations = {
 
 export const actions = {
   async fetchAssignments({ commit }) {
-    commit('setAssignments', await generic_get(this, 'assignments'))
+    commit('setAssignments', await generic_get(this, '/assignments/'))
   },
-  async addAssignment({ commit }, {assignment, file}) {
+  async addAssignment({ commit }, {assignment, submissions, solutions}) {
     const db_assignment =  await generic_post(this, '/assignments/', assignment)
-    uploadAssignmentFile(this, file, db_assignment)
+
+    if (submissions) uploadAssignmentFile(this, submissions, db_assignment)
+    if (solutions) uploadAssignmentFile(this, solutions, db_assignment)
+
     commit('addAssignment', db_assignment)
   },
   async fetchAssignment({ commit }, id) {
-    commit('setAssignment', await generic_get(this, `assignments/${id}/`))
+    commit('setAssignment', await generic_get(this, `/assignments/${id}/`))
   },
   async deleteAssignment({ commit }, id) {
-    await generic_delete(this, `assignments/${id}/`)
+    await generic_delete(this, `/assignments/${id}/`)
     commit('setAssignment', undefined)
     commit('removeAssignment', id)
   },
