@@ -1,5 +1,6 @@
 import datetime
 import os
+import shutil
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, ARRAY
 from sqlalchemy.orm import relationship
@@ -10,13 +11,15 @@ from .database import BaseModel
 
 
 class Course(BaseModel):
-    d2l_id = Column(String)
     name = Column(String)
+
+    assignments = relationship('Assignment')
 
 
 class Assignment(BaseModel):
-    # class_id = Column(ForeignKey('course.id'), nullable=False)
-    name = Column(String, unique=True, nullable=False)
+    course_id = Column(ForeignKey('course.id'))
+    name = Column(String, nullable=False)
+    description = Column(String)
     due_datetime = Column(DateTime)
     expected_files = Column(ARRAY(String))
     submissions = relationship('Submission', backref="assignment", cascade="all,delete,delete-orphan")
@@ -24,6 +27,13 @@ class Assignment(BaseModel):
     @property
     def path(self):
         return os.path.join(config.UPLOAD_DIR, self.name)
+
+    def delete(self, session):
+        super().delete(session)
+
+        # Cleaning up folders
+        if os.path.exists(path := self.path) and os.path.isdir(path):
+            shutil.rmtree(path)
 
 
 class Student(BaseModel):

@@ -78,3 +78,8 @@ class AssignmentCreate(BaseSchema):
     name: str
     due_datetime: datetime
 
+
+class ActiveJob(BaseORMSchema):
+    name: str
+    type: str
+    status: str
