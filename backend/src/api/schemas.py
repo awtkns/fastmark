@@ -12,7 +12,7 @@ class BaseORMSchema(BaseSchema):
 
 
 class Student(BaseORMSchema):
-    d2l_id: str
+    d2l_id: Optional[str]
     name: str
 
 
@@ -47,6 +47,7 @@ class Submission(BaseORMSchema):
     submission_datetime: datetime
     late: bool
     overdue: bool
+    is_key: bool
 
     student: Student
     files: List[SubmissionFile]

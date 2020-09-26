@@ -3,6 +3,7 @@ import os
 import shutil
 
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, ARRAY
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -27,7 +28,7 @@ class Assignment(BaseModel):
 
     @property
     def path(self):
-        return os.path.join(config.UPLOAD_DIR, self.name)
+        return os.path.join(config.UPLOAD_DIR, f'{self.name}_{self.id}')
 
     def delete(self, session):
         super().delete(session)
@@ -45,12 +46,12 @@ class Student(BaseModel):
 class Submission(BaseModel):
     assignment_id = Column(ForeignKey('assignment.id', ondelete='CASCADE'), nullable=False)
     student_id = Column(ForeignKey('student.id', ondelete='CASCADE'), nullable=False)
-    submission_datetime = Column(DateTime)
+    submission_datetime = Column(DateTime, default=datetime.datetime.now)
     is_key = Column(Boolean, default=False)
 
     student = relationship('Student')
     files = relationship('SubmissionFile', backref="submission", cascade="all,delete,delete-orphan")
-    build_result = relationship('BuildResult', backref="submission", uselist=False)
+    build_result = relationship('BuildResult', backref="submission", cascade="all,delete,delete-orphan", uselist=False)
 
     @hybrid_property
     def late(self):
