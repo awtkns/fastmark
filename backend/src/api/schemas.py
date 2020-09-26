@@ -33,7 +33,7 @@ class BuildResult(BaseORMSchema):
     exit_code: int
 
     error_message: Optional[str]
-    test_result: Optional[TestResult] = None
+    test_results: Optional[List[TestResult]] = []
 
 
 class SubmissionFile(BaseORMSchema):
