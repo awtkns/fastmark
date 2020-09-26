@@ -18,7 +18,7 @@ test_lock = Lock()
 
 
 @dramatiq.actor
-def test_submission(build_result_id: int, job_id: int):
+def test_submission(build_result_id: int, job_id: int, solution=False):
     with worker_session() as db:
         if not (build := db.query(models.BuildResult).get(build_result_id)):
             print(f'[Test ERROR] Build Result {build_result_id} DNE')
@@ -34,7 +34,7 @@ def test_submission(build_result_id: int, job_id: int):
         working_dir = os.path.join(config.UPLOAD_DIR, build.submission.path)  # Abs path
 
     # Long Running Task
-    report_name = os.path.join(working_dir, 'test_report.json')
+    report_name = os.path.join(working_dir, f'{"solution" if solution else "submission"}_report.json')
     with test_lock:
         with open(f'{working_dir}/stderr.log', 'w') as stderr:
             process = subprocess.run(
@@ -105,18 +105,17 @@ def build_submission(submission_id: int, job_id: int):
         ).save(db)
 
         print(f'[BUILD {student_name}] Returned with exit code {result.exit_code}')
+
+        if job := db.query(models.ActiveJob).get(job_id):
+            job.delete(db)
+
         if result.exit_code == 0:
-
-            if job := db.query(models.ActiveJob).get(job_id):
-                job.status = 'queued'
-                job.type = 'test'
-                job.save(db)
-
+            solution_test_job = models.ActiveJob(name=student_name, status='queued', type='solution test').save(db)
+            submission_test_job = models.ActiveJob(name=student_name, status='queued', type='submission test').save(db)
             db.commit()
-            test_submission.send_with_options(args=(result.id, job_id))
-        else:
-            if job := db.query(models.ActiveJob).get(job_id):
-                job.delete(db)
+
+            test_submission.send_with_options(args=(result.id, submission_test_job.id,))
+            test_submission.send_with_options(args=(result.id, solution_test_job.id, True,))
 
 
 def start_job(submission: models.Submission, db: Session):

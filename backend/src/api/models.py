@@ -68,7 +68,7 @@ class Submission(BaseModel):
 
 
 class TestResult(BaseModel):
-    build_result_id = Column(ForeignKey('build_result.id', ondelete='CASCADE'), nullable=False, unique=True)
+    build_result_id = Column(ForeignKey('build_result.id', ondelete='CASCADE'), nullable=False)
     exit_code = Column(Integer, nullable=False)
     error_message = Column(String)
 
@@ -77,7 +77,7 @@ class TestResult(BaseModel):
     total_errors = Column(Integer)
 
     json_report = Column(postgresql.JSONB)
-    error_report_path = Column(String)
+    stderr = Column(String)
 
 
 class BuildResult(BaseModel):
@@ -85,7 +85,7 @@ class BuildResult(BaseModel):
     exit_code = Column(Integer)
     error_message = Column(String)
 
-    test_result = relationship('TestResult', cascade="all,delete,delete-orphan", uselist=False)
+    test_results = relationship('TestResult', cascade="all,delete,delete-orphan")
 
 
 class SubmissionFile(BaseModel):

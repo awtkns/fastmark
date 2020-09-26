@@ -1,10 +1,11 @@
 <template>
-  <v-row>
+  <v-row justify="end">
     <v-col cols="12">
       <v-chip dark v-for="f in submission.files" v-text="f.filename" class="mx-1"/>
     </v-col>
     <v-col v-if="!buildResult" cols="12" class="text-h4 text-center">
       Submission has yet to be built.
+
     </v-col>
 
     <!-- Build Results -->
@@ -39,11 +40,7 @@
     <v-col v-if="buildResult && testResult" cols="6" >
       <test-report :report="testResult.json_report" />
     </v-col>
-
-
-    <v-col cols="12">
-      <btn-build-submission :submission="submission"/>
-    </v-col>
+    <btn-build-submission :submission="submission"/>
   </v-row>
 </template>
 
