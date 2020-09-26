@@ -22,7 +22,7 @@
     </v-col>
 
     <!-- Test Results -->
-    <v-col v-if="buildResult && testResult" cols="12">
+    <v-col v-if="buildResult && testResult" cols="6">
       <v-list>
         <v-list-item class="title">Test Results</v-list-item>
         <v-divider/>
@@ -36,6 +36,9 @@
         </v-list-item>
       </v-list>
     </v-col>
+    <v-col v-if="buildResult && testResult" cols="6" >
+      <test-report :report="testResult.json_report" />
+    </v-col>
 
 
     <v-col cols="12">
@@ -45,8 +48,10 @@
 </template>
 
 <script>
+import TestReport from "./test_report/test-report";
 export default {
   name: "submission-info",
+  components: {TestReport},
   props: {
     submission: undefined
   },
