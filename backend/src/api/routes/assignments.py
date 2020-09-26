@@ -38,9 +38,10 @@ def delete_assignment(assignment_id: int, db: session = Depends(session)):
 def set_assignment_solution(assignment_id: int, file: bytes = File(...), db: session = Depends(session)):
     """Upload a solution for the assignment."""
 
-    solution = models.AssignmentSolution(assignment_id=assignment_id)
-    solution.save(db)
-    solution.set_path()
+    if not (key_student := db.query(models.Student).filter_by(name="__KEY__").first()):
+        key_student = models.Student(name="__KEY__").save(db)
+
+    solution = models.Submission(assignment_id=assignment_id, is_key=True, student_id=key_student.id)
     solution.save(db)
 
     with open('tmp_key', 'wb') as f:
