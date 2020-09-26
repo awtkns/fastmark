@@ -63,6 +63,10 @@ class CourseCreate(BaseSchema):
     name: str
 
 
+class AssignmentSolution(BaseORMSchema):
+    build_result: Optional[BuildResult] = None
+
+
 class Assignment(BaseORMSchema):
     name: str
     due_datetime: datetime
@@ -71,6 +75,7 @@ class Assignment(BaseORMSchema):
 
 class AssignmentFull(Assignment):
     submissions: Optional[List[Submission]] = []
+    solution: Optional[AssignmentSolution] = None
 
 
 class AssignmentCreate(BaseSchema):

@@ -34,18 +34,19 @@ def delete_assignment(assignment_id: int, db: session = Depends(session)):
     return 'Deleted'
 
 
-@router.post("/assignments/{assignment_id}/key", response_model=schemas.Assignment)
+@router.post("/assignments/{assignment_id}/key", response_model=schemas.AssignmentSolution)
 def set_assignment_solution(assignment_id: int, file: bytes = File(...), db: session = Depends(session)):
     """Upload a solution for the assignment."""
 
-    assignment = db.query(models.Assignment).get(assignment_id)
-    assignment.set_solution_path()
+    solution = models.AssignmentSolution(assignment_id=assignment_id)
+    solution.save(db)
+    solution.set_path()
+    solution.save(db)
 
     with open('tmp_key', 'wb') as f:
         f.write(file)
 
-    shutil.unpack_archive('tmp_key', extract_dir=assignment.solution_path, format='zip')
-    utils.flatten_dir(assignment.solution_path)
-    assignment.save(db)
+    shutil.unpack_archive('tmp_key', extract_dir=solution.path, format='zip')
+    utils.flatten_dir(solution.path)
 
-    return assignment
+    return solution
