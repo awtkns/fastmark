@@ -17,10 +17,6 @@ build_lock = Lock()
 test_lock = Lock()
 
 
-def is_build_artifact(filename):
-    return not (filename.endswith('.h') or filename.endswith('.cpp'))
-
-
 @dramatiq.actor
 def test_submission(build_result_id: int, job_id: int):
     with worker_session() as db:
@@ -38,12 +34,11 @@ def test_submission(build_result_id: int, job_id: int):
         working_dir = os.path.join(config.UPLOAD_DIR, build.submission.path)  # Abs path
 
     # Long Running Task
-    report_name = os.path.join(working_dir, 'report.json')
+    report_name = os.path.join(working_dir, 'test_report.json')
     with test_lock:
-        with open(f'{working_dir}/stdout.log', 'w') as stdout, open(f'{working_dir}/stderr.log', 'w') as stderr:
+        with open(f'{working_dir}/stderr.log', 'w') as stderr:
             process = subprocess.run(
-                [f'{working_dir}/fcts_unittest --gtest_output="json:{report_name}"'],
-                stdout=stdout,
+                [f'{working_dir}/solution_unittest --gtest_output="json:{report_name}"'],
                 stderr=stderr,
                 shell=True
             )
@@ -64,12 +59,18 @@ def test_submission(build_result_id: int, job_id: int):
 
             with open(report_name) as fp:
                 data = json.load(fp)
+            os.remove(report_name)
 
             result.total_tests = data['tests']
             result.failures = data['failures']
             result.errors = data['errors']
-            result.json_report_path = os.path.relpath(report_name, config.UPLOAD_DIR)
+            result.json_report = data
         result.save(db)
+
+
+def copy_artifacts(destination_folder):
+    for f in os.listdir(config.ARTIFACTS_DIR):
+        shutil.copyfile(os.path.join(config.ARTIFACTS_DIR, f), os.path.join(destination_folder, f))
 
 
 @dramatiq.actor
@@ -88,15 +89,13 @@ def build_submission(submission_id: int, job_id: int):
         student_name = submission.student.name
         if build := submission.build_result:
             build.delete(db)
-            [os.remove(fp) for f in os.listdir(working_dir) if os.path.isfile(fp := os.path.join(working_dir, f)) and is_build_artifact(f)]
 
-        makefile = os.path.join(config.UPLOAD_DIR, 'Makefile')
-        shutil.copyfile(makefile, os.path.join(working_dir, 'Makefile'))
+        copy_artifacts(destination_folder=working_dir)
         print(f'[BUILD {student_name}] Building submission')
 
     # Long Running Task
     with build_lock:
-        process = subprocess.run([f'(cd {working_dir} && make)'], capture_output=True, text=True, shell=True)
+        process = subprocess.run([f'(cd {working_dir} && touch * && make)'], capture_output=True, text=True, shell=True)
 
     with worker_session() as db:
         result = models.BuildResult(

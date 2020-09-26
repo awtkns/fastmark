@@ -11,13 +11,18 @@ class BaseConfig:
     API_PORT = 5000
     RABBITMQ_HOST = LOCALHOST
     DOCKER_URI = 'unix://var/run/docker.sock'
+    ARTIFACTS_DIR = '__ARTIFACTS__'
 
     def __init__(self):
         env_vars = [v for v in os.environ.keys() if (v in vars(BaseConfig)) and not v.startswith('__')]
         [self.apply_env_var(k) for k in env_vars]
 
+        self.ARTIFACTS_DIR = os.path.join(self.UPLOAD_DIR, self.ARTIFACTS_DIR)
         if not os.path.exists(self.UPLOAD_DIR):
             os.mkdir(self.UPLOAD_DIR)
+
+        if not os.path.exists(self.ARTIFACTS_DIR):
+            os.mkdir(self.ARTIFACTS_DIR)
 
     def apply_env_var(self, env_var) -> None:
         v = os.environ[env_var]

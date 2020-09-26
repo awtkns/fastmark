@@ -1,7 +1,7 @@
 from typing import List, Optional
 from datetime import datetime
 
-from pydantic import BaseModel as BaseSchema
+from pydantic import BaseModel as BaseSchema, Json
 
 
 class BaseORMSchema(BaseSchema):
@@ -24,7 +24,7 @@ class TestResult(BaseORMSchema):
     total_tests: Optional[int]
     total_errors: Optional[int]
     total_failures: Optional[int]
-    json_report_path: Optional[str]
+    json_report: Optional[dict]
     error_report_path: Optional[str]
 
 

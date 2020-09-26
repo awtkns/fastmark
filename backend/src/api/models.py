@@ -5,6 +5,7 @@ import shutil
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, ARRAY
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from . import config
@@ -75,7 +76,7 @@ class TestResult(BaseModel):
     total_failures = Column(Integer)
     total_errors = Column(Integer)
 
-    json_report_path = Column(String)
+    json_report = Column(postgresql.JSONB)
     error_report_path = Column(String)
 
 
