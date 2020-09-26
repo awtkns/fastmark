@@ -18,6 +18,7 @@ class Student(BaseORMSchema):
 
 class TestResult(BaseORMSchema):
     build_result_id: int
+    name: str
     exit_code: int
 
     error_message: Optional[str]
