@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, File, Form
-from api import schemas, session, models, config
+from api import schemas, session, models, config, utils
 
 router = APIRouter()
 
@@ -41,6 +41,8 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
     shutil.unpack_archive('tmp', extract_dir=assignment_folder, format='zip')
 
     for file in os.listdir(assignment_folder):
+        print(file)
+
         zip_path = os.path.join(assignment_folder, file)
 
         if os.path.isdir(file):
@@ -62,12 +64,7 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
 
             os.mkdir(submission_folder := db_submission.path)
             shutil.unpack_archive(zip_path, extract_dir=submission_folder)
-
-            for cur_dir, _, files in os.walk(submission_folder):
-                if cur_dir == submission_folder:
-                    continue
-
-                [shutil.move(os.path.join(cur_dir, f), os.path.join(submission_folder, f)) for f in files]
+            utils.flatten_dir(submission_folder)
 
             # Cleaning up
             [os.rmdir(dir_) for dir_ in os.listdir(submission_folder) if os.path.isdir(dir_)]
@@ -78,6 +75,9 @@ async def create_upload_file(file: bytes = File(...), filename: str = Form(...),
                 path=os.path.relpath(p, config.UPLOAD_DIR)
             ).save(db) for f in os.listdir(submission_folder) if not delete_makefile(p := os.path.join(submission_folder, f))]
 
-        os.remove(zip_path)
+        try:
+            os.remove(zip_path)
+        except PermissionError:
+            pass
 
     return {"filename": filename}

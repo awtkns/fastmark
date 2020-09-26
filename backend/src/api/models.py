@@ -22,11 +22,16 @@ class Assignment(BaseModel):
     description = Column(String)
     due_datetime = Column(DateTime)
     expected_files = Column(ARRAY(String))
+    solution_path = Column(String)
+
     submissions = relationship('Submission', backref="assignment", cascade="all,delete,delete-orphan")
 
     @property
     def path(self):
         return os.path.join(config.UPLOAD_DIR, self.name)
+
+    def set_solution_path(self, folder_name='__KEY__'):
+        self.solution_path = os.path.join(self.path, folder_name)
 
     def delete(self, session):
         super().delete(session)
