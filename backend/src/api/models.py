@@ -60,7 +60,7 @@ class Submission(BaseModel):
 
     @property
     def path(self):
-        return os.path.join(self.assignment.path, f"{self.student.d2l_id}_{self.student.name.replace(' ', '')}")
+        return os.path.join(self.assignment.path, f"{self.student.name.replace(' ', '')}")
 
 
 class TestResult(BaseModel):

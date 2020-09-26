@@ -19,8 +19,10 @@ def get_assignments(db: session = Depends(session)):
 
 @router.get("/assignments/{assignment_id}", response_model=schemas.AssignmentFull)
 def get_assignment(assignment_id: int, db: session = Depends(session)):
-    ass = db.query(models.Assignment).get(assignment_id)
-    return ass
+    assignment = db.query(models.Assignment).get(assignment_id)
+    assignment.submissions.sort(key=lambda x: x.student.name)
+
+    return assignment
 
 
 @router.delete("/assignments/{assignment_id}")
