@@ -5,7 +5,6 @@
     </v-col>
     <v-col v-if="!buildResult" cols="12" class="text-h4 text-center">
       Submission has yet to be built.
-
     </v-col>
 
     <!-- Build Results -->
@@ -16,26 +15,26 @@
         <v-list-item v-if="buildResult.error_message">
           <pre class="error--text">Error Message: {{ buildResult.error_message }}</pre>
         </v-list-item>
-        <v-list-item>Exit Code:&nbsp;<span :class="buildResult.exit_code !== 0 ? 'error--text' : 'success--text'"
-                                           v-text="buildResult.exit_code"/>
+        <v-list-item>Exit Code:&nbsp;
+          <span :class="buildResult.exit_code !== 0 ? 'error--text' : 'success--text'" v-text="buildResult.exit_code"/>
         </v-list-item>
       </v-list>
     </v-col>
 
     <!-- Test Results -->
-    <v-col v-if="buildResult" v-for="testResult in buildResult.test_results" cols="6">
+    <v-col v-if="testResults" v-for="tr in testResults" cols="6">
       <v-list>
-        <v-list-item class="title">{{ testResult.name }} Results</v-list-item>
+        <v-list-item class="title">{{ tr.name }} Results</v-list-item>
         <v-divider/>
-        <v-list-item v-if="testResult.error_message">
-          <pre class="error--text">Error Message: {{ testResult.error_message }}</pre>
+        <v-list-item v-if="tr.stderr">
+          <pre class="error--text">Error Message: {{ tr.error_message }}</pre>
         </v-list-item>
-        <v-list-item v-if="testResult.total_tests">Total Tests: {{ testResult.total_tests }}</v-list-item>
-        <v-list-item v-if="testResult.totaL_errors">Total Errors: {{ testResult.totaL_errors }}</v-list-item>
-        <v-list-item v-if="testResult.total_failures">Total Failures: {{ testResult.total_failures }}</v-list-item>
-        <v-list-item>Exit Code:&nbsp;<span :class="testResult.exit_code !== 0 ? 'error--text' : 'success--text'" v-text="testResult.exit_code"/>
+        <v-list-item v-if="tr.total_tests">Total Tests: {{ tr.total_tests }}</v-list-item>
+        <v-list-item v-if="tr.totaL_errors">Total Errors: {{ tr.totaL_errors }}</v-list-item>
+        <v-list-item v-if="tr.total_failures">Total Failures: {{ tr.total_failures }}</v-list-item>
+        <v-list-item>Exit Code:&nbsp;<span :class="tr.exit_code !== 0 ? 'error--text' : 'success--text'" v-text="tr.exit_code"/>
         </v-list-item>
-        <test-report :report="testResult.json_report" />
+        <test-report :report="tr.json_report" />
       </v-list>
     </v-col>
     <btn-build-submission :submission="submission"/>
@@ -52,6 +51,7 @@ export default {
   },
   computed: {
       buildResult: (ctx) => ctx.submission.build_result,
+      testResults: (ctx) => ctx.buildResult ? ctx.buildResult.test_results : undefined
   },
 }
 </script>
