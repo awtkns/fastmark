@@ -35,28 +35,25 @@ def test_submission(build_result_id: int, job_id: int, solution=False):
 
     # Long Running Task
     report_name = os.path.join(working_dir, f'{"solution" if solution else "submission"}_report.json')
+    test_suite = 'solution_unittest' if solution else 'fcts_unittest'
+    cmd = [f'{working_dir}/{test_suite} --gtest_output="json:{report_name}"']
+
     with test_lock:
-        with open(f'{working_dir}/stderr.log', 'w') as stderr:
-            process = subprocess.run(
-                [f'{working_dir}/solution_unittest --gtest_output="json:{report_name}"'],
-                stderr=stderr,
-                shell=True
-            )
+        process = subprocess.run(cmd, capture_output=True, shell=True)
 
     with worker_session() as db:
         result = models.TestResult(
             build_result_id=build_result_id,
+            name=test_suite,
             exit_code=process.returncode,
-            # error_message=process.stderr
+            stderr=process.stderr
         )
 
         if job := db.query(models.ActiveJob).get(job_id):
             job.delete(db)
 
         print(f'[Test {student_name}] Returned with exit code {result.exit_code}')
-        if result.exit_code == 0:
-            assert os.path.exists(report_name)
-
+        if os.path.exists(report_name):
             with open(report_name) as fp:
                 data = json.load(fp)
             os.remove(report_name)

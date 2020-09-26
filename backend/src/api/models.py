@@ -69,6 +69,7 @@ class Submission(BaseModel):
 
 class TestResult(BaseModel):
     build_result_id = Column(ForeignKey('build_result.id', ondelete='CASCADE'), nullable=False)
+    name = Column(String)
     exit_code = Column(Integer, nullable=False)
     error_message = Column(String)
 

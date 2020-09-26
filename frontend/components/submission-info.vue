@@ -23,9 +23,9 @@
     </v-col>
 
     <!-- Test Results -->
-    <v-col v-if="buildResult && testResult" cols="6">
+    <v-col v-if="buildResult" v-for="testResult in buildResult.test_results" cols="6">
       <v-list>
-        <v-list-item class="title">Test Results</v-list-item>
+        <v-list-item class="title">{{ testResult.name }} Results</v-list-item>
         <v-divider/>
         <v-list-item v-if="testResult.error_message">
           <pre class="error--text">Error Message: {{ testResult.error_message }}</pre>
@@ -35,10 +35,8 @@
         <v-list-item v-if="testResult.total_failures">Total Failures: {{ testResult.total_failures }}</v-list-item>
         <v-list-item>Exit Code:&nbsp;<span :class="testResult.exit_code !== 0 ? 'error--text' : 'success--text'" v-text="testResult.exit_code"/>
         </v-list-item>
+        <test-report :report="testResult.json_report" />
       </v-list>
-    </v-col>
-    <v-col v-if="buildResult && testResult" cols="6" >
-      <test-report :report="testResult.json_report" />
     </v-col>
     <btn-build-submission :submission="submission"/>
   </v-row>
@@ -54,7 +52,6 @@ export default {
   },
   computed: {
       buildResult: (ctx) => ctx.submission.build_result,
-      testResult: (ctx) => ctx.submission.build_result.test_result
   },
 }
 </script>
