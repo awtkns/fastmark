@@ -56,11 +56,11 @@ def test_submission(build_result_id: int, job_id: int, solution=False):
         if os.path.exists(report_name):
             with open(report_name) as fp:
                 data = json.load(fp)
-            os.remove(report_name)
+            # os.remove(report_name)
 
             result.total_tests = data['tests']
-            result.failures = data['failures']
-            result.errors = data['errors']
+            result.total_failures = data['failures']
+            result.total_errors = data['errors']
             result.json_report = data
         result.save(db)
 
