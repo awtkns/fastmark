@@ -22,16 +22,31 @@ class Assignment(BaseModel):
     description = Column(String)
     due_datetime = Column(DateTime)
     expected_files = Column(ARRAY(String))
-    solution_path = Column(String)
 
+    solution = relationship('AssignmentSolution', backref="assignment", cascade="all,delete,delete-orphan", uselist=False)
     submissions = relationship('Submission', backref="assignment", cascade="all,delete,delete-orphan")
 
     @property
     def path(self):
         return os.path.join(config.UPLOAD_DIR, self.name)
 
-    def set_solution_path(self, folder_name='__KEY__'):
-        self.solution_path = os.path.join(self.path, folder_name)
+    def delete(self, session):
+        super().delete(session)
+
+        # Cleaning up folders
+        if os.path.exists(path := self.path) and os.path.isdir(path):
+            shutil.rmtree(path)
+
+
+class AssignmentSolution(BaseModel):
+    assignment_id = Column(ForeignKey('assignment.id'), unique=True)
+    build_result_id = Column(ForeignKey('build_result.id'))
+    path = Column(String)
+
+    build_result = relationship('BuildResult', uselist=False)
+
+    def set_path(self, folder_name='__KEY__'):
+        self.path = os.path.join(self.assignment.path, folder_name)
 
     def delete(self, session):
         super().delete(session)
@@ -49,11 +64,12 @@ class Student(BaseModel):
 class Submission(BaseModel):
     assignment_id = Column(ForeignKey('assignment.id', ondelete='CASCADE'), nullable=False)
     student_id = Column(ForeignKey('student.id', ondelete='CASCADE'), nullable=False)
+    build_result_id = Column(ForeignKey('build_result.id'))
     submission_datetime = Column(DateTime)
 
     student = relationship('Student')
     files = relationship('SubmissionFile', backref="submission", cascade="all,delete,delete-orphan")
-    build_result = relationship('BuildResult', backref="submission", uselist=False)
+    build_result = relationship('BuildResult', uselist=False)
 
     @hybrid_property
     def late(self):
@@ -82,7 +98,6 @@ class TestResult(BaseModel):
 
 
 class BuildResult(BaseModel):
-    submission_id = Column(ForeignKey('submission.id', ondelete='CASCADE'), unique=True)
     exit_code = Column(Integer)
     error_message = Column(String)
 
