@@ -37,15 +37,18 @@
         <test-report :report="tr.json_report" />
       </v-list>
     </v-col>
-    <btn-build-submission :submission="submission"/>
+    <btn-open-submission :submission="submission" />
+    <btn-build-submission :submission="submission" />
   </v-row>
 </template>
 
 <script>
 import TestReport from "./test_report/test-report";
+import BtnOpenSubmission from "./btn-open-submission";
+import BtnBuildSubmission from "./btn-build-submission";
 export default {
   name: "submission-info",
-  components: {TestReport},
+  components: {BtnBuildSubmission, BtnOpenSubmission, TestReport},
   props: {
     submission: undefined
   },

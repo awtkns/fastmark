@@ -1,5 +1,5 @@
 <template>
-  <v-btn text @click="buildSubmission(submission)">Build</v-btn>
+  <v-btn text @click="buildSubmission(submission)" color="info">Build</v-btn>
 </template>
 
 <script>
