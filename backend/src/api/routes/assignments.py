@@ -1,7 +1,8 @@
 import shutil
+import os
 from typing import List
 from fastapi import APIRouter, Depends, File, Form
-from api import schemas, session, models, utils
+from api import schemas, session, models, utils, config
 
 router = APIRouter()
 
@@ -24,6 +25,24 @@ def get_assignment(assignment_id: int, db: session = Depends(session)):
     assignment.submissions.sort(key=lambda x: x.student.name)
 
     return assignment
+
+
+@router.put("/assignments/{assignment_id}")
+def make_moss_folder(assignment_id: int, db: session = Depends(session)):
+    assignment = db.query(models.Assignment).get(assignment_id)
+    files = db.query(models.SubmissionFile)\
+        .join(models.Submission, models.Assignment)\
+        .filter(models.SubmissionFile.filename == "fcts.cpp", models.Assignment.id == assignment_id)\
+        .all()
+
+    moss_folder = os.path.join(assignment.path, '__MOSS__')
+    if os.path.exists(moss_folder):
+        shutil.rmtree(moss_folder)
+    os.mkdir(moss_folder)
+    [shutil.copy(
+            os.path.join(config.UPLOAD_DIR, f.path),
+            os.path.join(moss_folder, f'{f.submission.student.name.replace(" ","")}_{f.filename}'))
+        for f in files]
 
 
 @router.delete("/assignments/{assignment_id}")
