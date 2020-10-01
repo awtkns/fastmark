@@ -142,9 +142,10 @@ def build_submission_route(submission_id, db: Session = Depends(session)):
 @router.get("/submissions/{submission_id}")
 def open_submission_route(submission_id: int, db: Session = Depends(session)):
     submission = db.query(models.Submission).get(submission_id)
-    folder = submission.path
+    paths = [os.path.join(config.UPLOAD_DIR, f.path) for f in submission.files if f.filename in [
+        'fcts.cpp', 'fcts.h', 'fcts_unittest.cpp', 'README.txt'
+    ]]
 
-    paths = [os.path.join(folder, f) for f in ['fcts.cpp', 'fcts.h', 'fcts_unittest.cpp']]
     cmd = [f'C:\Program Files\Sublime Text 3\sublime_text.exe']
     cmd.extend(paths)
 
