@@ -19,3 +19,13 @@
 
 ---
 
+## Deployment
+
+FastMark can be deployed in a single command using docker and docker-compose. Simply clone this repository and then run
+the following command in the root of your FastMark folder.
+
+```bash
+docker-compose up -d
+```
+
+The UI of the application can be found at http://localhost:3000 while the backend can be found at http://localhost:5000/
