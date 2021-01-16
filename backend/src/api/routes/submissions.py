@@ -35,7 +35,7 @@ def test_submission(build_result_id: int, job_id: int, solution=False):
 
     # Long Running Task
     report_name = os.path.join(working_dir, f'{"solution" if solution else "submission"}_report.json')
-    test_suite = 'solution_unittest' if solution else 'fcts_unittest'
+    test_suite = 'BST_unittest' if solution else 'BST_unittest'
     cmd = [f'{working_dir}/{test_suite} --gtest_output="json:{report_name}"']
 
     with test_lock:
@@ -142,11 +142,13 @@ def build_submission_route(submission_id, db: Session = Depends(session)):
 @router.get("/submissions/{submission_id}")
 def open_submission_route(submission_id: int, db: Session = Depends(session)):
     submission = db.query(models.Submission).get(submission_id)
-    paths = [os.path.join(config.UPLOAD_DIR, f.path) for f in submission.files if f.filename in [
-        'fcts.cpp', 'fcts.h', 'fcts_unittest.cpp', 'README.txt'
-    ]]
 
-    cmd = [f'C:\Program Files\Sublime Text 3\sublime_text.exe']
+    expected_files = list(submission.assignment.expected_files)
+    paths = [os.path.join(config.UPLOAD_DIR, f.path) for f in submission.files
+             if f.filename in expected_files or f.filename.endswith('.txt')
+    ]
+
+    cmd = [config.SUBLIME_PATH]
     cmd.extend(paths)
 
     subprocess.run(cmd)
