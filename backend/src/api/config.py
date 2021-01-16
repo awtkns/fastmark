@@ -5,7 +5,7 @@ LOCALHOST = '127.0.0.1'
 
 
 class BaseConfig:
-    UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
+    UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'uploads')
     POSTGRES_URL = "postgresql+psycopg2://postgres:password@localhost:54320/fastmark?gssencmode=disable"
     API_HOST = LOCALHOST
     API_PORT = 5000
