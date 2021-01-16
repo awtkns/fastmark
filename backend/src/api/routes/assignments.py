@@ -32,7 +32,7 @@ def make_moss_folder(assignment_id: int, db: session = Depends(session)):
     assignment = db.query(models.Assignment).get(assignment_id)
     files = db.query(models.SubmissionFile)\
         .join(models.Submission, models.Assignment)\
-:ti        .filter(models.SubmissionFile.filename == "BST.cpp", models.Assignment.id == assignment_id)\
+        .filter(models.SubmissionFile.filename == "BST.cpp", models.Assignment.id == assignment_id)\
         .all()
 
     moss_folder = os.path.join(assignment.path, '__MOSS__')
