@@ -22,11 +22,11 @@
             <v-col cols="12" sm="6">
               <v-text-field v-model="assignment.dueTime" label="Due Time" type="time" suffix="PST" />
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12">
               <v-file-input
                 v-model="assignment.submissions"
                 accept=".zip"
-                label="D2L Submission ZIP"
+                label="D2L Submission ZIP*"
                 append-icon="mdi-folder"
                 prepend-icon="" />
             </v-col>
@@ -34,9 +34,24 @@
               <v-file-input
                 v-model="assignment.solution"
                 accept=".cpp"
-                label="Solution Unittest"
+                label="Solution Unittest*"
+                append-icon="mdi-file"
+                prepend-icon=""
+                @change="updateName"
+              />
+            </v-col>
+            <v-col cols="6">
+              <v-file-input
+                v-model="assignment.makefile"
+                label="Makefile*"
                 append-icon="mdi-file"
                 prepend-icon="" />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="assignment.solution_test_suite" label="Solution Test Suite*" />
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="assignment.student_test_suite" label="Student Test Suite" />
             </v-col>
             <v-col cols="12">
               <v-combobox
@@ -73,7 +88,10 @@ export default {
       dueTime: '22:00',
       submissions: undefined,
       solution: undefined,
-      expected_files: []
+      expected_files: [],
+      makefile: undefined,
+      solution_test_suite: '',
+      student_test_suite: ''
     }
   }),
   methods: {
@@ -83,18 +101,23 @@ export default {
            assignment: {
              'name': this.assignment.name,
              'due_datetime': new Date(`${this.assignment.dueDate} ${this.assignment.dueTime}`).toISOString(),
-             expected_files: this.assignment.expected_files
+             expected_files: this.assignment.expected_files,
+             solution_test_suite: this.assignment.solution_test_suite,
+             student_test_suite: this.assignment.student_test_suite
            },
            submissions: this.assignment.submissions,
-           solution: this.assignment.solution
+           solution: this.assignment.solution,
+           makefile: this.makefile
          })
         this.dialog = false
       } catch (e) {
         window.alert(e.message + ' - Are you missing a field?')
       }
-
-
-
+    },
+    updateName () {
+      if (this.assignment.solution) {
+        this.assignment.solution_test_suite = this.assignment.solution.name.replace('.cpp', '' )
+      }
     }
   }
 }

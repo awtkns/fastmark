@@ -24,6 +24,8 @@ class Assignment(BaseModel):
     description = Column(String)
     due_datetime = Column(DateTime)
     expected_files = Column(ARRAY(String))
+    solution_test_suite = Column(String)
+    student_test_suite = Column(String)
 
     submissions = relationship('Submission', backref="assignment", cascade="all,delete,delete-orphan")
 
