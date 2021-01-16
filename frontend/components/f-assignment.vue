@@ -14,7 +14,7 @@
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="assignment.name" label="Assigment Name" />
+              <v-text-field v-model="assignment.name" label="Assigment Name*" />
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field v-model="assignment.dueDate" label="Due Date" type="date" />
@@ -27,28 +27,29 @@
                 v-model="assignment.submissions"
                 accept=".zip"
                 label="D2L Submission ZIP"
-                append-icon="mdi-file"
+                append-icon="mdi-folder"
                 prepend-icon="" />
             </v-col>
             <v-col cols="6">
               <v-file-input
                 v-model="assignment.solution"
-                accept=".zip"
-                label="Solution Key"
+                accept=".cpp"
+                label="Solution Unittest"
                 append-icon="mdi-file"
                 prepend-icon="" />
             </v-col>
-<!--            <v-col cols="12">-->
-<!--              <v-combobox-->
-<!--                label="Expected Files Names"-->
-<!--                chips-->
-<!--                multiple-->
-<!--                disable-lookup-->
-<!--                :delimiters="[',',' ',';']"-->
-<!--                deletable-chips-->
-<!--                counter-->
-<!--              />-->
-<!--            </v-col>-->
+            <v-col cols="12">
+              <v-combobox
+                label="Expected Files Names"
+                chips
+                multiple
+                disable-lookup
+                :delimiters="[',',' ',';']"
+                deletable-chips
+                counter
+                v-model="assignment.expected_files"
+              />
+            </v-col>
           </v-row>
         </v-container>
       </v-card-text>
@@ -71,20 +72,29 @@ export default {
       dueDate: new Date().toLocaleDateString("en-US"),
       dueTime: '22:00',
       submissions: undefined,
-      solution: undefined
+      solution: undefined,
+      expected_files: []
     }
   }),
   methods: {
     async submit() {
-      this.$store.dispatch('addAssignment', {
-        assignment: {
-          'name': this.assignment.name,
-          'due_datetime': new Date(`${this.assignment.dueDate} ${this.assignment.dueTime}`).toISOString()
-        },
-        submissions: this.assignment.submissions,
-        solution: this.assignment.solution
-      })
-      // await uploadAssignmentFile(this, this.assignment.file, 1)
+      try {
+         await this.$store.dispatch('addAssignment', {
+           assignment: {
+             'name': this.assignment.name,
+             'due_datetime': new Date(`${this.assignment.dueDate} ${this.assignment.dueTime}`).toISOString(),
+             expected_files: this.assignment.expected_files
+           },
+           submissions: this.assignment.submissions,
+           solution: this.assignment.solution
+         })
+        this.dialog = false
+      } catch (e) {
+        window.alert(e.message + ' - Are you missing a field?')
+      }
+
+
+
     }
   }
 }

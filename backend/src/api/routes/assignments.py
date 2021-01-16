@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.post("/assignments/", response_model=schemas.Assignment)
 def add_assignment(assignment: schemas.AssignmentCreate, db: session = Depends(session)):
-    db_assignment = models.Assignment(expected_files=['fcts.cpp', 'fcts.h', 'fcts_unittest.cpp'], **assignment.dict()).save(db)
+    db_assignment = models.Assignment(**assignment.dict()).save(db)
 
     return db_assignment
 

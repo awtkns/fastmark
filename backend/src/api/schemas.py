@@ -84,6 +84,7 @@ class AssignmentCreate(BaseSchema):
     # class_id: int
     name: str
     due_datetime: datetime
+    expected_files: Optional[List[str]] = []
 
 
 class ActiveJob(BaseORMSchema):

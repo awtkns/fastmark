@@ -44,3 +44,10 @@ services:
     volumes:
       - ./backend/src/api:/app/api
       - ./uploads:/app/uploads
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - docker.env
