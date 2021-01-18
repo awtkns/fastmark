@@ -1,5 +1,5 @@
 <template>
-  <v-row justify="end">
+  <v-row justify="start">
     <v-col cols="12">
       <v-chip dark v-for="f in submission.files" v-text="f.filename" class="mx-1"/>
     </v-col>
@@ -22,7 +22,7 @@
     </v-col>
 
     <!-- Test Results -->
-    <v-col v-if="testResults" v-for="tr in testResults" cols="6">
+    <v-col v-if="testResults" v-for="tr in testResults" :cols="testResults.length === 1 ? 12 : 6">
       <v-list>
         <v-list-item class="title">{{ tr.name }} Results</v-list-item>
         <v-divider/>
@@ -37,8 +37,12 @@
         <test-report :report="tr.json_report" />
       </v-list>
     </v-col>
-    <btn-open-submission :submission="submission" />
-    <btn-build-submission :submission="submission" />
+    <v-col cols="12">
+      <v-row no-gutters justify="end">
+        <btn-open-submission :submission="submission"/>
+        <btn-build-submission :submission="submission"/>
+      </v-row>
+    </v-col>
   </v-row>
 </template>
 
