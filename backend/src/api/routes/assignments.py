@@ -1,7 +1,7 @@
 import shutil
 import os
 from typing import List
-from fastapi import APIRouter, Depends, File, Form
+from fastapi import APIRouter, Depends, File, Form, HTTPException
 from api import schemas, session, models, utils, config
 
 router = APIRouter()
@@ -53,20 +53,16 @@ def delete_assignment(assignment_id: int, db: session = Depends(session)):
     return 'Deleted'
 
 
-@router.post("/assignments/{assignment_id}/key", response_model=schemas.AssignmentSolution)
-def set_assignment_solution(assignment_id: int, file: bytes = File(...), db: session = Depends(session)):
-    """Upload a solution for the assignment."""
+@router.post("/assignments/{assignment_id}/artifacts")
+def set_assignment_solution(assignment_id: int, file: bytes = File(...), filename: str = Form(...), db: session = Depends(session)):
+    """ Upload build artifacts for the assignment."""
 
-    if not (key_student := db.query(models.Student).filter_by(name="__KEY__").first()):
-        key_student = models.Student(name="__KEY__").save(db)
+    if not (assignment := db.query(models.Assignment).get(assignment_id)):
+        raise HTTPException(404)
 
-    solution = models.Submission(assignment_id=assignment_id, is_key=True, student_id=key_student.id)
-    solution.save(db)
+    if not os.path.exists(artifacts_path := assignment.artifacts_path):
+        os.mkdir(artifacts_path)
 
-    with open('tmp_key', 'wb') as f:
+    file_path = os.path.join(artifacts_path, filename)
+    with open(file_path, 'wb') as f:
         f.write(file)
-
-    shutil.unpack_archive('tmp_key', extract_dir=solution.path, format='zip')
-    utils.flatten_dir(solution.path)
-
-    return solution

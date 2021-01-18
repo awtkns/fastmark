@@ -107,7 +107,7 @@ export default {
            },
            submissions: this.assignment.submissions,
            solution: this.assignment.solution,
-           makefile: this.makefile
+           makefile: this.assignment.makefile
          })
         this.dialog = false
       } catch (e) {

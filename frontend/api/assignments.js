@@ -9,14 +9,15 @@ export const uploadAssignmentFile = async ({ $axios }, file, assignment) => {
   await $axios.post('ingest', formData)
 }
 
-export const uploadAssignmentKey = async ({ $axios }, file, assignment_id) => {
+export const uploadAssignmentArtifact = async ({ $axios }, file, assignment_id) => {
   const f = await readFile(file)
+  console.log(file)
 
   // Uploading File to server
   const formData = new FormData()
   formData.append('filename', file.name)
-  formData.append('file', new Blob([f], { type: '.zip' }))
-  await $axios.post(`/assignments/${assignment_id}/key`, formData)
+  formData.append('file', new Blob([f]))
+  await $axios.post(`/assignments/${assignment_id}/artifacts`, formData)
 }
 
 

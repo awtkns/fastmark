@@ -1,5 +1,5 @@
 import { generic_get, generic_post, generic_delete } from "~/api";
-import { uploadAssignmentFile, uploadAssignmentKey } from "~/api/assignments"
+import { uploadAssignmentFile, uploadAssignmentArtifact } from "~/api/assignments"
 
 export const state = () => ({
   assignments: [],
@@ -18,12 +18,12 @@ export const actions = {
   async fetchAssignments({ commit }) {
     commit('setAssignments', await generic_get(this, '/assignments/'))
   },
-  async addAssignment({ commit }, {assignment, submissions, solution}) {
+  async addAssignment({ commit }, {assignment, submissions, solution, makefile}) {
     const db_assignment =  await generic_post(this, '/assignments/', assignment)
 
-    console.log(submissions)
-    if (submissions) uploadAssignmentFile(this, submissions, db_assignment)
-    if (solution) uploadAssignmentKey(this, solution, db_assignment.id)
+    if (submissions) await uploadAssignmentFile(this, submissions, db_assignment)
+    if (solution) await uploadAssignmentArtifact(this, solution, db_assignment.id)
+    if (makefile) await uploadAssignmentArtifact(this, makefile, db_assignment.id)
 
     commit('addAssignment', db_assignment)
   },

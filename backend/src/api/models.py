@@ -33,6 +33,10 @@ class Assignment(BaseModel):
     def path(self):
         return os.path.join(config.UPLOAD_DIR, f'{self.name}_{self.id}')
 
+    @property
+    def artifacts_path(self):
+        return os.path.join(self.path, '__ARTIFACTS__')
+
     def delete(self, session):
         super().delete(session)
 

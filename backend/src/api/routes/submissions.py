@@ -18,7 +18,7 @@ test_lock = Lock()
 
 
 @dramatiq.actor
-def test_submission(build_result_id: int, job_id: int, solution=False):
+def test_submission(build_result_id: int, job_id: int, test_suite: str, solution=False):
     with worker_session() as db:
         if not (build := db.query(models.BuildResult).get(build_result_id)):
             print(f'[Test ERROR] Build Result {build_result_id} DNE')
@@ -35,7 +35,6 @@ def test_submission(build_result_id: int, job_id: int, solution=False):
 
     # Long Running Task
     report_name = os.path.join(working_dir, f'{"solution" if solution else "submission"}_report.json')
-    test_suite = 'BST_unittest' if solution else 'BST_unittest'
     cmd = [f'{working_dir}/{test_suite} --gtest_output="json:{report_name}"']
 
     with test_lock:
@@ -65,9 +64,9 @@ def test_submission(build_result_id: int, job_id: int, solution=False):
         result.save(db)
 
 
-def copy_artifacts(destination_folder):
-    for f in os.listdir(config.ARTIFACTS_DIR):
-        shutil.copyfile(os.path.join(config.ARTIFACTS_DIR, f), os.path.join(destination_folder, f))
+def copy_artifacts(src_folder, destination_folder):
+    for f in os.listdir(src_folder):
+        shutil.copyfile(os.path.join(src_folder, f), os.path.join(destination_folder, f))
 
 
 @dramatiq.actor
@@ -79,6 +78,8 @@ def build_submission(submission_id: int, job_id: int):
             return
 
         working_dir = os.path.join(config.UPLOAD_DIR, submission.path)
+        print(config.UPLOAD_DIR, submission.path)
+        print(working_dir)
         if job := db.query(models.ActiveJob).get(job_id):
             job.status = 'building'
             job.save(db)
@@ -87,7 +88,7 @@ def build_submission(submission_id: int, job_id: int):
         if build := submission.build_result:
             build.delete(db)
 
-        copy_artifacts(destination_folder=working_dir)
+        copy_artifacts(src_folder=submission.assignment.artifacts_path, destination_folder=working_dir)
         print(f'[BUILD {student_name}] Building submission')
 
     # Long Running Task
@@ -111,8 +112,11 @@ def build_submission(submission_id: int, job_id: int):
             submission_test_job = models.ActiveJob(name=student_name, status='queued', type='submission test').save(db)
             db.commit()
 
-            test_submission.send_with_options(args=(result.id, submission_test_job.id,))
-            test_submission.send_with_options(args=(result.id, solution_test_job.id, True,))
+            assignment = result.submission.assignment
+            test_submission.send_with_options(args=(result.id, solution_test_job.id, assignment.solution_test_suite, True))
+
+            if student_test_suite := assignment.student_test_suite:
+                test_submission.send_with_options(args=(result.id, submission_test_job.id, student_test_suite))
 
 
 def start_job(submission: models.Submission, db: Session):

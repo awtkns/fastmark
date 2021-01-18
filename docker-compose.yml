@@ -31,23 +31,23 @@ services:
       - ./backend/src/api:/app/api
       - ./uploads:/app/uploads
 
-  api:
-    build: ./backend
-    env_file:
-      - docker.env
-    depends_on:
-      - queue
-      - db
-      - worker
-    ports:
-      - '5000:5000'
-    volumes:
-      - ./backend/src/api:/app/api
-      - ./uploads:/app/uploads
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    env_file:
-      - docker.env
+#  api:
+#    build: ./backend
+#    env_file:
+#      - docker.env
+#    depends_on:
+#      - queue
+#      - db
+#      - worker
+#    ports:
+#      - '5000:5000'
+#    volumes:
+#      - ./backend/src/api:/app/api
+#      - ./uploads:/app/uploads
+#
+#  frontend:
+#    build: ./frontend
+#    ports:
+#      - "3000:3000"
+#    env_file:
+#      - docker.env
