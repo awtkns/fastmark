@@ -24,7 +24,13 @@
         </v-list-item-content>
 
       </v-list-item>
-      <v-divider></v-divider>
+      <v-divider/>
+      <v-list-item :to="`/dashboard`">
+        <v-list-item-content>
+          <v-list-item-title>Active Jobs</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider/>
 
       <v-list dense nav>
         <v-list-item v-for="a in assignments" :key="a.id" :to="`/assignments/${a.id}`">
@@ -58,24 +64,19 @@
   export default {
     components: {FAssignment},
     data: () => ({
-      nav: false
+      nav: true
     }),
     computed: {
       ...mapState(['assignments']),
       crumbs: ctx => {
-        if (ctx.$route.path === '/') return [
-          {
-            to: '/',
-            text: 'Dashboard'
-          }
-        ]
+        if (ctx.$route.path === '/') return []
 
         const routes = ctx.$route.path.split('/');
         const items = []
         for (const i in routes) {
           items.push({
             to: items.length ? items[items.length - 1].to + `${routes[i]}/` : '/',
-            text: routes[i] ? routes[i] : 'Dashboard'
+            text: routes[i] ? routes[i] : ''
           })
         }
 

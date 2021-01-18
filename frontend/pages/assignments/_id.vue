@@ -6,12 +6,12 @@
       <v-btn text outlined @click="buildAll">Build All</v-btn>
     </v-row>
 
-    <v-expansion-panels dark v-model="keyPanel" class="mb-2">
-      <v-expansion-panel>
-        <v-expansion-panel-header color="deep-purple" class="title">KEY</v-expansion-panel-header>
-        <v-expansion-panel-content><submission-info :submission="key" :assignment="assignment" /></v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+<!--    <v-expansion-panels dark v-model="keyPanel" class="mb-2">-->
+<!--      <v-expansion-panel>-->
+<!--        <v-expansion-panel-header color="deep-purple" class="title">KEY</v-expansion-panel-header>-->
+<!--        <v-expansion-panel-content><submission-info :submission="key" :assignment="assignment" /></v-expansion-panel-content>-->
+<!--      </v-expansion-panel>-->
+<!--    </v-expansion-panels>-->
 
     <v-expansion-panels v-model="panel">
       <submission-panel v-for="submission in submissions" :submission="submission" :assignment="assignment"/>

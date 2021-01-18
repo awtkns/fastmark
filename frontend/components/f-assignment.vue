@@ -2,7 +2,7 @@
   <v-dialog v-model="dialog" persistent max-width="600px">
     <template v-slot:activator="{ on }">
       <v-btn  v-on="on" block outlined>
-        <v-icon>mdi-plus</v-icon>
+        Add Assignment<v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
 
