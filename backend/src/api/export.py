@@ -27,8 +27,9 @@ def generate_results_report(assignment) -> bytes:
             'overdue': s.overdue,
             'build exit_code': s.build_result.exit_code if s.build_result else np.NaN,
             **get_test_results(s)
-        } for s in assignments.submissions
+        } for s in assignment.submissions
     ]
 
     df = pd.DataFrame.from_records(submissions)
+    df = df.sort_values('name')
     return bytes(df.to_csv(index=False), encoding='utf-8')

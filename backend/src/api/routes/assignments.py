@@ -1,7 +1,9 @@
 import shutil
 import os
+import io
 from typing import List
 from fastapi import APIRouter, Depends, File, Form, HTTPException
+from fastapi.responses import StreamingResponse
 from api import schemas, session, models, utils, config, worker_session, export
 
 router = APIRouter()
@@ -33,7 +35,7 @@ def get_assignment(assignment_id: int, db: session = Depends(session)):
     bytes_ = export.generate_results_report(assignment)
     report_name = f'{assignment.name}_report'
 
-    response = StreamingResponse(bytes_, media_type="application/x-zip-compressed")
+    response = StreamingResponse(io.BytesIO(bytes_), media_type="application/x-zip-compressed")
     response.headers["Content-Disposition"] = f"attachment; filename={report_name}.csv"
 
     return response

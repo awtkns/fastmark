@@ -55,7 +55,6 @@ def test_submission(build_result_id: int, job_id: int, test_suite: str, solution
         if os.path.exists(report_name):
             with open(report_name) as fp:
                 data = json.load(fp)
-            # os.remove(report_name)
 
             result.total_tests = data['tests']
             result.total_failures = data['failures']
@@ -128,9 +127,9 @@ def start_job(submission: models.Submission, db: Session):
     build_submission.send_with_options(args=(submission.id, job.id,), priority=10)
 
 
-@router.post("/submissions/")
-def build_all_submissions_route(db: Session = Depends(session)):
-    [start_job(s, db) for s in db.query(models.Submission).all()]
+@router.post("/submissions")
+def build_all_submissions_route(assignment_id: int, db: Session = Depends(session)):
+    [start_job(s, db) for s in db.query(models.Submission).filter_by(assignment_id=assignment_id).all()]
 
     return 'ok'
 

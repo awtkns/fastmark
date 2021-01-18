@@ -4,6 +4,7 @@
       <span class="text-h1" v-text="assignment.name" style="text-transform: capitalize"/>
       <v-spacer/>
       <v-btn text outlined @click="buildAll">Build All</v-btn>
+      <v-btn text outlined @click="generateReport">Generate Report</v-btn>
     </v-row>
 
 <!--    <v-expansion-panels dark v-model="keyPanel" class="mb-2">-->
@@ -34,10 +35,11 @@
 
 <script>
   import {mapState} from 'vuex'
-  import {generic_post} from "~/api";
+  import {generic_post, generic_get} from "~/api";
   import SubmissionPanel from "../../components/submission-panel";
   import BtnBuildSubmission from "../../components/btn-build-submission";
   import SubmissionInfo from "../../components/submission-info";
+  const FileDownload = require('js-file-download')
 
   export default {
     name: "assignment",
@@ -57,11 +59,20 @@
     },
     methods: {
       async buildAll() {
-        let r = await generic_post(this, `/submissions/`)
+        let r = await generic_post(this, `/submissions?assignment_id=${this.assignment.id}`)
         console.log(r)
       },
       deleteAssignment() {
         this.$store.dispatch('deleteAssignment', this.assignment.id)
+      },
+      async generateReport() {
+        const URL = `/assignments/${this.assignment.id}/export`
+        try {
+          const results = await generic_get(this, URL, {responseType: 'arraybuffer'})
+          FileDownload(results, `${this.assignment.name}_report.csv`)
+        } catch (e) {
+          window.alert('Could not download file')
+        }
       }
     }
   }

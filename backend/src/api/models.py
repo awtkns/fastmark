@@ -31,7 +31,7 @@ class Assignment(BaseModel):
 
     @property
     def path(self):
-        return os.path.join(config.UPLOAD_DIR, f'{self.name}_{self.id}')
+        return os.path.join(config.UPLOAD_DIR, f'{self.name}_{self.id}'.replace(' ', ''))
 
     @property
     def artifacts_path(self):
