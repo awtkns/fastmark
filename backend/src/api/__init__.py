@@ -15,7 +15,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import models, schemas
-from .database import session, engine
+from .database import session, engine, worker_session
 from .websockets import router
 
 models.BaseModel.metadata.create_all(bind=engine)
@@ -31,3 +31,5 @@ app.add_middleware(
 from . import routes
 
 config.apply_post_initialization_config()
+
+
