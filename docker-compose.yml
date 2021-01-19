@@ -10,6 +10,8 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - 54320:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
 
   queue:
     image: rabbitmq
@@ -51,3 +53,6 @@ services:
       - "3000:3000"
     env_file:
       - docker.env
+
+volumes:
+  pg_data:
