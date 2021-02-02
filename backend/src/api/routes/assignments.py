@@ -1,10 +1,13 @@
-import shutil
-import os
 import io
+import os
+import shutil
 from typing import List
+
+import mosspy
 from fastapi import APIRouter, Depends, File, Form, HTTPException
 from fastapi.responses import StreamingResponse
-from api import schemas, session, models, utils, config, worker_session, export
+
+from api import schemas, session, models, config, export
 
 router = APIRouter()
 
@@ -46,17 +49,25 @@ def make_moss_folder(assignment_id: int, db: session = Depends(session)):
     assignment = db.query(models.Assignment).get(assignment_id)
     files = db.query(models.SubmissionFile)\
         .join(models.Submission, models.Assignment)\
-        .filter(models.SubmissionFile.filename == "BST.cpp", models.Assignment.id == assignment_id)\
+        .filter(models.SubmissionFile.filename == "LList.cpp", models.Assignment.id == assignment_id)\
         .all()
+
+    m = mosspy.Moss(config.MOSS_USERNAME, 'cc')
 
     moss_folder = os.path.join(assignment.path, '__MOSS__')
     if os.path.exists(moss_folder):
         shutil.rmtree(moss_folder)
     os.mkdir(moss_folder)
     [shutil.copy(
-            os.path.join(config.UPLOAD_DIR, f.path),
-            os.path.join(moss_folder, f'{f.submission.student.name.replace(" ","")}_{f.filename}'))
+        os.path.join(config.UPLOAD_DIR, f.path),
+        os.path.join(moss_folder, f'{f.submission.student.name.replace(" ", "")}_{f.filename}'))
         for f in files]
+
+    m.addFilesByWildcard(f'{moss_folder}/*.cpp')
+    url = m.send()
+
+    assignment.description = url
+    assignment.save(db)
 
 
 @router.delete("/assignments/{assignment_id}")

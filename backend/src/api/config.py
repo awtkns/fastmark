@@ -13,6 +13,7 @@ class BaseConfig:
     DOCKER_URI = 'unix://var/run/docker.sock'
     ARTIFACTS_DIR = '__ARTIFACTS__'
     SUBLIME_PATH = 'C:\\Program Files\\Sublime Text 3\\sublime_text.exe'
+    MOSS_USERNAME = 'CHANGE ME'
 
     def __init__(self):
         env_vars = [v for v in os.environ.keys() if (v in vars(BaseConfig)) and not v.startswith('__')]
